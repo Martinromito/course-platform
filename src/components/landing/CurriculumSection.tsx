@@ -62,43 +62,43 @@ export default function CurriculumSection() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <section id="contenido" className="py-24 bg-slate-900">
+    <section id="contenido" className="py-24 bg-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
-          <span className="text-violet-400 text-sm font-semibold uppercase tracking-widest">
+          <span className="text-[#b04b2b] text-sm font-bold uppercase tracking-widest">
             Qué vas a aprender
           </span>
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-white mt-3 mb-4">
-            Contenido del curso
+          <h2 className="text-4xl sm:text-5xl font-extrabold text-[#3e2723] mt-3 mb-4">
+            Proyectos del curso
           </h2>
-          <div className="flex items-center justify-center gap-6 mt-4 text-slate-400 text-sm">
-            <span>📚 {modules.length} módulos</span>
-            <span>🎥 40+ horas de video</span>
-            <span>📁 Archivos descargables</span>
+          <div className="flex items-center justify-center gap-6 mt-4 text-[#8d6e63] text-sm">
+            <span>🧵 {modules.length} módulos</span>
+            <span>🎥 Videos paso a paso</span>
+            <span>📥 Moldes incluidos</span>
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {modules.map((mod, idx) => (
             <div
               key={idx}
-              className="border border-slate-700 rounded-2xl overflow-hidden bg-slate-800/50 hover:border-slate-600 transition-colors"
+              className="border border-[#d7ccc8] rounded-3xl overflow-hidden bg-[#fdfaf5] hover:border-[#b04b2b]/30 transition-colors shadow-sm"
             >
               <button
                 onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
-                className="w-full flex items-center justify-between p-5 text-left"
+                className="w-full flex items-center justify-between p-6 text-left"
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-8 h-8 rounded-lg bg-violet-600/20 border border-violet-600/30 flex items-center justify-center text-violet-400 font-bold text-sm">
+                <div className="flex items-center gap-5">
+                  <div className="w-10 h-10 rounded-xl bg-[#b04b2b]/10 border border-[#b04b2b]/20 flex items-center justify-center text-[#b04b2b] font-bold text-lg">
                     {idx + 1}
                   </div>
                   <div>
-                    <h3 className="text-white font-semibold">{mod.title}</h3>
-                    <span className="text-slate-500 text-xs">{mod.duration} · {mod.lessons.length} lecciones</span>
+                    <h3 className="text-[#3e2723] font-bold text-lg">{mod.title}</h3>
+                    <span className="text-[#8d6e63] text-xs uppercase tracking-wider font-semibold">{mod.duration}</span>
                   </div>
                 </div>
                 <svg
-                  className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${openIdx === idx ? 'rotate-180' : ''}`}
+                  className={`w-6 h-6 text-[#bcaaa4] transition-transform duration-300 ${openIdx === idx ? 'rotate-180' : ''}`}
                   fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -106,13 +106,11 @@ export default function CurriculumSection() {
               </button>
 
               {openIdx === idx && (
-                <div className="border-t border-slate-700 px-5 pb-5">
-                  <ul className="space-y-2 mt-4">
+                <div className="border-t border-[#d7ccc8] px-6 pb-6 pt-2">
+                  <ul className="space-y-3 mt-4">
                     {mod.lessons.map((lesson, li) => (
-                      <li key={li} className="flex items-center gap-3 text-slate-400 text-sm">
-                        <span className="w-5 h-5 rounded-full border border-slate-600 flex items-center justify-center text-xs text-slate-500">
-                          {li + 1}
-                        </span>
+                      <li key={li} className="flex items-center gap-4 text-[#5d4037] text-sm">
+                        <div className="w-2 h-2 rounded-full bg-[#e9a68a]" />
                         {lesson}
                       </li>
                     ))}

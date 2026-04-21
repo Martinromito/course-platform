@@ -36,38 +36,35 @@ export default function BenefitsSection() {
   ];
 
   return (
-    <section id="beneficios" className="py-24 bg-slate-950">
+    <section id="beneficios" className="py-24 bg-[#fdfaf5]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-16">
-          <span className="text-violet-400 text-sm font-semibold uppercase tracking-widest">
+          <span className="text-[#b04b2b] text-sm font-bold uppercase tracking-widest">
             ¿Por qué elegirnos?
           </span>
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-white mt-3 mb-4">
+          <h2 className="text-4xl sm:text-5xl font-extrabold text-[#3e2723] mt-3 mb-4">
             Todo lo que necesitas para{' '}
-            <span className="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
-              triunfar
+            <span className="text-[#b04b2b]">
+              crear y emprender
             </span>
           </h2>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Un curso diseñado para llevarte de cero a empleado (o freelancer) en el menor tiempo posible.
+          <p className="text-[#5d4037] text-lg max-w-2xl mx-auto">
+            Un espacio pensado para que desarrolles tu creatividad y aprendas técnicas profesionales desde cero.
           </p>
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {benefits.map((b, i) => (
             <div
               key={i}
-              className="group relative p-6 rounded-2xl border border-slate-800 bg-slate-900/50 hover:border-violet-500/50 hover:bg-slate-900 transition-all duration-300"
+              className="group relative p-8 rounded-3xl border border-[#d7ccc8] bg-white hover:border-[#b04b2b]/50 hover:shadow-xl transition-all duration-300"
             >
-              {/* Glow on hover */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-500/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              
               <div className="relative">
-                <div className="text-4xl mb-4">{b.icon}</div>
-                <h3 className="text-white font-bold text-lg mb-2">{b.title}</h3>
-                <p className="text-slate-400 leading-relaxed">{b.description}</p>
+                <div className="text-5xl mb-6">{b.icon}</div>
+                <h3 className="text-[#3e2723] font-bold text-xl mb-3">{b.title}</h3>
+                <p className="text-[#8d6e63] leading-relaxed">{b.description}</p>
               </div>
             </div>
           ))}

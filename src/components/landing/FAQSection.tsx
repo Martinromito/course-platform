@@ -36,36 +36,36 @@ export default function FAQSection() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="py-24 bg-slate-900">
+    <section id="faq" className="py-24 bg-white">
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
-          <span className="text-violet-400 text-sm font-semibold uppercase tracking-widest">
+          <span className="text-[#b04b2b] text-sm font-bold uppercase tracking-widest">
             Preguntas frecuentes
           </span>
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-white mt-3">
+          <h2 className="text-4xl sm:text-5xl font-extrabold text-[#3e2723] mt-3">
             ¿Tienes dudas?
           </h2>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {faqs.map((faq, idx) => (
             <div
               key={idx}
-              className="border border-slate-700 rounded-2xl overflow-hidden bg-slate-800/30"
+              className="border border-[#d7ccc8] rounded-3xl overflow-hidden bg-[#fdfaf5]"
             >
               <button
                 onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
-                className="w-full flex items-center justify-between p-5 text-left gap-4"
+                className="w-full flex items-center justify-between p-6 text-left gap-4"
               >
-                <span className="text-white font-medium">{faq.q}</span>
-                <span className={`text-violet-400 text-xl flex-shrink-0 transition-transform duration-300 ${openIdx === idx ? 'rotate-45' : ''}`}>
+                <span className="text-[#3e2723] font-bold">{faq.q}</span>
+                <span className={`text-[#b04b2b] text-2xl flex-shrink-0 transition-transform duration-300 ${openIdx === idx ? 'rotate-45' : ''}`}>
                   +
                 </span>
               </button>
 
               {openIdx === idx && (
-                <div className="border-t border-slate-700 px-5 pb-5 pt-4">
-                  <p className="text-slate-400 leading-relaxed">{faq.a}</p>
+                <div className="border-t border-[#d7ccc8] px-6 pb-6 pt-5">
+                  <p className="text-[#5d4037] leading-relaxed font-medium">{faq.a}</p>
                 </div>
               )}
             </div>
