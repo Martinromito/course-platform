@@ -1,0 +1,14 @@
+// src/app/api/auth/logout/route.ts
+// Cierra sesión eliminando la cookie
+
+import { NextResponse } from 'next/server';
+
+export async function POST() {
+  const response = NextResponse.json({ message: 'Sesión cerrada.' });
+  response.cookies.set('auth_token', '', {
+    httpOnly: true,
+    expires: new Date(0),
+    path: '/',
+  });
+  return response;
+}
