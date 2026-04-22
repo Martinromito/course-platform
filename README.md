@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# La Mackenna - Academia de Artesanías 🏺
 
-## Getting Started
+Bienvenido a la plataforma oficial de **La Mackenna**, una academia digital dedicada a la enseñanza de artes manuales, cestería y textiles. Esta plataforma está diseñada para ofrecer una experiencia de aprendizaje premium, artesanal y fluida.
 
-First, run the development server:
+## ✨ Características Principales
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Doble Rol**: Experiencias personalizadas para Alumnos (Aprendizaje) y Administradores (Gestión).
+- **Panel de Control Admin**: Gestión completa de módulos, lecciones y videos de YouTube.
+- **Reproductor de Clases Premium**: Una interfaz minimalista y enfocada para una mejor concentración.
+- **Acceso Gratuito y de Pago**: Soporte para lecciones de vista previa y contenido exclusivo.
+- **Diseño Artesanal**: Paleta de colores terracota y crema con una estética moderna y limpia.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Stack Tecnológico
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: Next.js 14 (App Router)
+- **Lenguaje**: TypeScript
+- **Base de Datos**: MongoDB (Mongoose)
+- **Estilos**: Tailwind CSS
+- **Autenticación**: JWT con Cookies seguras
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Instalación y Uso
 
-## Learn More
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/Martinromito/course-platform.git
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Configurar variables de entorno:**
+   Crea un archivo `.env.local` con:
+   ```env
+   MONGODB_URI=tu_uri_de_mongodb
+   JWT_SECRET=tu_secreto_super_seguro
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Correr en desarrollo:**
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+## 📝 Notas de Desarrollo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+La aplicación cuenta con un **Modo Simulación** (Mocks). Si no tienes una instancia de MongoDB corriendo localmente, la plataforma cargará automáticamente contenido de prueba para que puedas explorar la interfaz y el flujo de usuario sin configuraciones adicionales.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Desarrollado con ❤️ para La Mackenna.

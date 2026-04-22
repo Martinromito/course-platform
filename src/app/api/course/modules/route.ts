@@ -8,8 +8,6 @@ import { verifyToken } from '@/lib/auth/jwt';
 
 export async function GET(req: NextRequest) {
   try {
-    await connectDB();
-
     // Verificar si el usuario está autenticado y pagó
     let isPaid = false;
     try {
@@ -22,17 +20,32 @@ export async function GET(req: NextRequest) {
       // No autenticado, solo mostrar previews
     }
 
-    const modules = await Module.find().sort({ order: 1 }).lean();
+    const { MOCK_MODULES } = require('@/lib/constants/course');
+    let modules = [];
+
+    try {
+      await connectDB();
+      modules = await Module.find().sort({ order: 1 }).lean();
+    } catch (dbError) {
+      console.warn('[DB WARNING] No se pudo conectar a MongoDB, usando mocks.');
+    }
+
+    // Si no hay módulos en la DB o falló la conexión, usar los mocks
+    if (!modules || modules.length === 0) {
+      modules = MOCK_MODULES;
+    }
 
     // Si no pagó, ocultar la URL de videos que no son preview
-    const sanitizedModules = modules.map((mod) => ({
+    const sanitizedModules = modules.map((mod: any) => ({
       ...mod,
       lessons: mod.lessons
-        .sort((a, b) => a.order - b.order)
-        .map((lesson) => ({
-          ...lesson,
-          videoUrl: isPaid || lesson.isPreview ? lesson.videoUrl : null,
-        })),
+        ? [...mod.lessons]
+            .sort((a: any, b: any) => a.order - b.order)
+            .map((lesson: any) => ({
+              ...lesson,
+              videoUrl: isPaid || lesson.isPreview ? lesson.videoUrl : null,
+            }))
+        : []
     }));
 
     return NextResponse.json({ modules: sanitizedModules });

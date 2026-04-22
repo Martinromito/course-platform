@@ -31,17 +31,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={inter.variable}>
-      <body className="bg-slate-950 text-white antialiased">
+    <html lang="es" className={inter.variable} suppressHydrationWarning>
+      <body className="bg-[#fdfaf5] text-[#3e2723] antialiased">
         <AuthProvider>
           {children}
           <Toaster
             position="top-right"
             toastOptions={{
               style: {
-                background: '#1e293b',
-                color: '#f1f5f9',
-                border: '1px solid #334155',
+                background: '#fff',
+                color: '#3e2723',
+                border: '1px solid #d7ccc8',
+                borderRadius: '16px',
+                fontSize: '14px',
+                fontWeight: '600',
               },
             }}
           />
