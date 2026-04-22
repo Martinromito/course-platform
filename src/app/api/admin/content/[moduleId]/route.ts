@@ -15,12 +15,12 @@ async function checkAdmin(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { moduleId: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ moduleId: string }> }) {
   if (!await checkAdmin(req)) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   }
 
-  const { moduleId } = params;
+  const { moduleId } = await params;
   const data = await req.json();
 
   try {
