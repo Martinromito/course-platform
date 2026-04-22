@@ -3,7 +3,7 @@
 
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_only_for_build';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? '7d';
 
 export interface JWTPayload {
