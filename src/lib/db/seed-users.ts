@@ -2,11 +2,8 @@
 import mongoose from 'mongoose';
 import User from '../models/User';
 import { MOCK_USERS } from '../constants/users';
-import * as dotenv from 'dotenv';
-import path from 'path';
-
-// Cargar variables de entorno
-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+// Cargar variables de entorno (Next.js las maneja automáticamente si se corre vía ts-node/next)
+// Si se corre solo, asegurar que las variables estén en el entorno.
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
