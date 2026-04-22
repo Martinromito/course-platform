@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     }
 
     const { MOCK_MODULES } = require('@/lib/constants/course');
-    let modules = [];
+    let modules: any[] = [];
 
     try {
       await connectDB();
