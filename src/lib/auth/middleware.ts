@@ -7,7 +7,7 @@ import { verifyToken, JWTPayload } from './jwt';
 export type AuthenticatedHandler = (
   req: NextRequest,
   user: JWTPayload,
-  context?: { params: Record<string, string> }
+  context?: { params: Promise<any> }
 ) => Promise<NextResponse>;
 
 /**
@@ -16,7 +16,7 @@ export type AuthenticatedHandler = (
 export function withAuth(handler: AuthenticatedHandler) {
   return async (
     req: NextRequest,
-    context?: { params: Record<string, string> }
+    context?: { params: Promise<any> }
   ): Promise<NextResponse> => {
     try {
       const cookieToken = req.cookies.get('auth_token')?.value;

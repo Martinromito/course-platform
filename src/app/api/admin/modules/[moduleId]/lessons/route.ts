@@ -11,8 +11,8 @@ import mongoose from 'mongoose';
 type Context = { params: { moduleId: string } };
 
 // POST: Agregar lección a un módulo
-export const POST = withAdmin(async (req: NextRequest, _user: JWTPayload, context?: { params: Record<string, string> }) => {
-  const moduleId = context?.params?.moduleId;
+export const POST = withAdmin(async (req: NextRequest, _user: JWTPayload, context?: { params: Promise<any> }) => {
+  const { moduleId } = (await context?.params) || {};
 
   if (!moduleId) {
     return NextResponse.json({ error: 'moduleId requerido.' }, { status: 400 });
