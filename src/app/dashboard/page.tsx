@@ -60,54 +60,55 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-[#fdfaf5]">
       <Navbar />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">¡Hola, {user?.name}! 👋</h1>
-          <p className="text-slate-400 mt-2">Bienvenido a tu plataforma de aprendizaje.</p>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
+        <div className="mb-12">
+          <h1 className="text-4xl font-black text-[#3e2723]">¡Hola de nuevo, {user?.name}! 👋</h1>
+          <p className="text-[#8d6e63] mt-3 font-medium text-lg">Es un gran día para seguir creando algo hermoso.</p>
         </div>
 
         {!user?.isPaid ? (
-          <div className="bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border border-violet-500/30 rounded-3xl p-8 text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">Acceso Limitado</h2>
-            <p className="text-slate-300 max-w-2xl mx-auto mb-8">
-              Tu cuenta está activa, pero aún no tienes acceso completo al curso. 
-              Completa tu pago para desbloquear todos los módulos y empezar a aprender.
+          <div className="bg-white border border-[#d7ccc8] rounded-[40px] p-12 text-center shadow-xl shadow-[#b04b2b]/5">
+            <div className="w-20 h-20 bg-[#e9a68a]/20 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">🔒</div>
+            <h2 className="text-3xl font-black text-[#3e2723] mb-4">Acceso Limitado</h2>
+            <p className="text-[#5d4037] max-w-2xl mx-auto mb-10 text-lg leading-relaxed">
+              Tu cuenta está activa, pero aún no tienes acceso completo a la academia. 
+              Inscríbete hoy para desbloquear todos los proyectos y empezar a aprender con nosotros.
             </p>
-            <Button size="lg" onClick={() => router.push('/#precio')}>
-              Desbloquear curso ahora
+            <Button size="xl" onClick={() => router.push('/#precio')}>
+              Desbloquear Academia ahora
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
-              <h2 className="text-xl font-bold text-white mb-4">Contenido del Curso</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            <div className="lg:col-span-2 space-y-8">
+              <h2 className="text-2xl font-black text-[#3e2723]">Tu Contenido</h2>
               {modules.map((mod, idx) => (
-                <div key={mod._id} className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden">
-                  <div className="p-5 border-b border-slate-800 bg-slate-800/30 flex justify-between items-center">
-                    <h3 className="font-bold text-white">Módulo {idx + 1}: {mod.title}</h3>
-                    <span className="text-xs text-slate-500">{mod.lessons.length} lecciones</span>
+                <div key={mod._id} className="bg-white border border-[#d7ccc8] rounded-3xl overflow-hidden shadow-sm">
+                  <div className="p-6 border-b border-[#d7ccc8] bg-[#fdfaf5] flex justify-between items-center">
+                    <h3 className="font-bold text-[#3e2723] text-lg">Módulo {idx + 1}: {mod.title}</h3>
+                    <span className="text-xs font-bold text-[#b04b2b] uppercase tracking-widest">{mod.lessons.length} lecciones</span>
                   </div>
-                  <div className="divide-y divide-slate-800">
+                  <div className="divide-y divide-[#d7ccc8]">
                     {mod.lessons.map((lesson) => (
                       <button
                         key={lesson._id}
                         onClick={() => router.push(`/dashboard/course/${mod._id}/${lesson._id}`)}
-                        className="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 transition-colors text-left group"
+                        className="w-full flex items-center justify-between p-5 hover:bg-[#fdfaf5] transition-colors text-left group"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-violet-600/20 group-hover:text-violet-400 transition-colors">
+                        <div className="flex items-center gap-5">
+                          <div className="w-10 h-10 rounded-xl bg-[#d7ccc8]/30 flex items-center justify-center text-[#b04b2b] group-hover:bg-[#b04b2b] group-hover:text-white transition-all">
                             ▶
                           </div>
                           <div>
-                            <span className="text-slate-200 font-medium">{lesson.title}</span>
+                            <span className="text-[#3e2723] font-bold group-hover:text-[#b04b2b] transition-colors">{lesson.title}</span>
                           </div>
                         </div>
                         {lesson.isPreview && !user?.isPaid && (
-                          <span className="text-[10px] font-bold bg-green-500/10 text-green-400 px-2 py-1 rounded uppercase tracking-wider">
-                            Vista previa
+                          <span className="text-[10px] font-bold bg-green-100 text-green-700 px-3 py-1 rounded-full uppercase tracking-wider">
+                            Clase abierta
                           </span>
                         )}
                       </button>
@@ -117,19 +118,19 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            <div className="space-y-6">
-              <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
-                <h2 className="text-xl font-bold text-white mb-4">Tu progreso</h2>
-                <div className="w-full bg-slate-800 rounded-full h-2.5 mb-2">
-                  <div className="bg-violet-600 h-2.5 rounded-full w-[10%]"></div>
+            <div className="space-y-8">
+              <div className="bg-white border border-[#d7ccc8] rounded-3xl p-8 shadow-sm">
+                <h2 className="text-xl font-black text-[#3e2723] mb-6">Tu progreso</h2>
+                <div className="w-full bg-[#fdfaf5] rounded-full h-3 mb-3 border border-[#d7ccc8]/30">
+                  <div className="bg-[#b04b2b] h-full rounded-full w-[10%] shadow-lg shadow-[#b04b2b]/20"></div>
                 </div>
-                <p className="text-sm text-slate-400">Has completado el 10% del curso</p>
+                <p className="text-sm font-bold text-[#8d6e63]">10% completado</p>
                 
-                <div className="mt-6 pt-6 border-t border-slate-800">
-                  <h3 className="text-sm font-bold text-slate-300 mb-4">Soporte</h3>
-                  <p className="text-xs text-slate-500 mb-4">¿Tienes alguna duda o problema técnico?</p>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Contactar soporte
+                <div className="mt-8 pt-8 border-t border-[#d7ccc8]">
+                  <h3 className="text-sm font-black text-[#3e2723] uppercase tracking-widest mb-4">Ayuda Personalizada</h3>
+                  <p className="text-sm text-[#5d4037] mb-6 leading-relaxed">¿Tienes dudas con algún proyecto? Estamos aquí para ayudarte.</p>
+                  <Button variant="outline" size="md" className="w-full">
+                    Enviar mensaje
                   </Button>
                 </div>
               </div>

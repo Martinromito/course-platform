@@ -71,10 +71,19 @@ export async function POST(req: NextRequest) {
     });
 
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error('[REGISTER ERROR]', error);
+    
+    // Si es un error de MongoDB (por ejemplo, conexión rechazada)
+    if (error.name === 'MongooseServerSelectionError') {
+      return NextResponse.json(
+        { error: 'No se pudo conectar a la base de datos. Por favor verifica que MongoDB esté corriendo.' },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
-      { error: 'Error interno del servidor.' },
+      { error: `Error interno: ${error.message || 'Desconocido'}` },
       { status: 500 }
     );
   }

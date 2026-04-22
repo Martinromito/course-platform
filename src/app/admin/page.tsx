@@ -90,22 +90,22 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 p-8">
+    <div className="min-h-screen bg-[#fdfaf5] p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-12">
           <div>
-            <h1 className="text-3xl font-bold text-white">Panel de Administración</h1>
-            <p className="text-slate-400 mt-2">Gestiona usuarios y contenido del curso.</p>
+            <h1 className="text-3xl font-black text-[#3e2723]">Panel de Control</h1>
+            <p className="text-[#8d6e63] mt-2 font-medium">Gestiona tu academia y tus alumnas.</p>
           </div>
           <Button variant="outline" onClick={() => router.push('/dashboard')}>Volver al sitio</Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Gestión de Módulos */}
-          <section className="space-y-6">
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-              <h2 className="text-xl font-bold text-white mb-6">Crear Nuevo Módulo</h2>
-              <form onSubmit={handleCreateModule} className="space-y-4">
+          <section className="space-y-8">
+            <div className="bg-white border border-[#d7ccc8] rounded-[40px] p-8 shadow-sm">
+              <h2 className="text-xl font-black text-[#3e2723] mb-8">Crear Nuevo Módulo</h2>
+              <form onSubmit={handleCreateModule} className="space-y-5">
                 <Input 
                   label="Título del Módulo" 
                   value={newModTitle} 
@@ -119,16 +119,16 @@ export default function AdminPage() {
                   onChange={e => setNewModOrder(e.target.value)}
                   required
                 />
-                <Button type="submit" className="w-full">Crear Módulo</Button>
+                <Button type="submit" className="w-full py-4 text-lg">Crear Módulo</Button>
               </form>
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-              <h2 className="text-xl font-bold text-white mb-6">Módulos Existentes</h2>
-              <div className="space-y-3">
+            <div className="bg-white border border-[#d7ccc8] rounded-[40px] p-8 shadow-sm">
+              <h2 className="text-xl font-black text-[#3e2723] mb-8">Módulos Existentes</h2>
+              <div className="space-y-4">
                 {modules.map(mod => (
-                  <div key={mod._id} className="flex justify-between items-center p-4 bg-slate-800/50 rounded-xl border border-slate-700">
-                    <span className="text-white font-medium">{mod.order}. {mod.title}</span>
+                  <div key={mod._id} className="flex justify-between items-center p-5 bg-[#fdfaf5] rounded-2xl border border-[#d7ccc8]">
+                    <span className="text-[#3e2723] font-bold">{mod.order}. {mod.title}</span>
                     <Button variant="ghost" size="sm">Editar</Button>
                   </div>
                 ))}
@@ -137,27 +137,27 @@ export default function AdminPage() {
           </section>
 
           {/* Lista de Usuarios */}
-          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-            <h2 className="text-xl font-bold text-white mb-6">Usuarios Registrados ({users.length})</h2>
+          <section className="bg-white border border-[#d7ccc8] rounded-[40px] p-8 shadow-sm">
+            <h2 className="text-xl font-black text-[#3e2723] mb-8">Alumnas Registradas ({users.length})</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-slate-500 border-b border-slate-800">
-                    <th className="pb-4 font-medium">Nombre</th>
-                    <th className="pb-4 font-medium">Email</th>
-                    <th className="pb-4 font-medium">Estado</th>
+                  <tr className="text-[#8d6e63] border-b border-[#d7ccc8]">
+                    <th className="pb-5 font-bold uppercase text-xs tracking-widest">Nombre</th>
+                    <th className="pb-5 font-bold uppercase text-xs tracking-widest">Email</th>
+                    <th className="pb-5 font-bold uppercase text-xs tracking-widest text-center">Estado</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800">
+                <tbody className="divide-y divide-[#d7ccc8]">
                   {users.map(u => (
                     <tr key={u._id} className="text-sm">
-                      <td className="py-4 text-white font-medium">{u.name}</td>
-                      <td className="py-4 text-slate-400">{u.email}</td>
-                      <td className="py-4">
-                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${
-                          u.isPaid ? 'bg-green-500/10 text-green-400' : 'bg-slate-500/10 text-slate-500'
+                      <td className="py-5 text-[#3e2723] font-bold">{u.name}</td>
+                      <td className="py-5 text-[#5d4037]">{u.email}</td>
+                      <td className="py-5 text-center">
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${
+                          u.isPaid ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
                         }`}>
-                          {u.isPaid ? 'PAGADO' : 'PENDIENTE'}
+                          {u.isPaid ? 'ACTIVA' : 'PENDIENTE'}
                         </span>
                       </td>
                     </tr>

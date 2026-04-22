@@ -165,38 +165,47 @@ export default function CoursePlayerPage() {
               <p className="text-slate-300 leading-relaxed">
                 {currentLesson.description || 'No hay descripción disponible para esta lección.'}
               </p>
-            </div>
+      <div className="flex-1 pt-24 flex flex-col lg:flex-row overflow-hidden">
+        {/* Sidebar de navegación del curso */}
+        <div className="w-full lg:w-80 bg-white border-r border-[#d7ccc8] flex-shrink-0 flex flex-col">
+          <div className="p-6 border-b border-[#d7ccc8] bg-[#fdfaf5]">
+            <h2 className="text-[#3e2723] font-black text-lg">Contenido</h2>
+            <p className="text-[#8d6e63] text-xs font-bold uppercase tracking-widest mt-1">Tu proceso creativo</p>
           </div>
-        </div>
-
-        {/* Lado derecho: Lista de reproducción */}
-        <div className="w-full lg:w-[400px] space-y-4">
-          <h2 className="text-xl font-bold text-white px-2">Contenido del curso</h2>
-          <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto divide-y divide-[#d7ccc8]">
             {modules.map((mod, mIdx) => (
-              <div key={mod._id} className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden">
-                <div className="p-4 bg-slate-800/50 border-b border-slate-800">
-                  <h3 className="font-bold text-sm text-slate-200">Módulo {mIdx + 1}: {mod.title}</h3>
+              <div key={mod._id} className="bg-white">
+                <div className="px-5 py-3 bg-[#fdfaf5]/50 flex items-center gap-3">
+                  <span className="text-[#b04b2b] font-bold text-xs">{mIdx + 1}</span>
+                  <span className="text-[#3e2723] font-bold text-xs uppercase tracking-tight">{mod.title}</span>
                 </div>
-                <div className="divide-y divide-slate-800">
+                <div className="divide-y divide-[#d7ccc8]/50">
                   {mod.lessons.map((lesson) => (
                     <button
                       key={lesson._id}
+                      disabled={!user?.isPaid && !lesson.isPreview}
                       onClick={() => router.push(`/dashboard/course/${mod._id}/${lesson._id}`)}
-                      className={`w-full flex items-center gap-3 p-4 hover:bg-slate-800/30 transition-colors text-left ${
-                        params.lessonId === lesson._id ? 'bg-violet-600/10 border-l-4 border-violet-500' : ''
+                      className={`w-full flex items-center gap-4 p-4 text-left transition-all ${
+                        lessonId === lesson._id
+                          ? 'bg-[#b04b2b] text-white shadow-inner'
+                          : !user?.isPaid && !lesson.isPreview
+                          ? 'opacity-40 grayscale cursor-not-allowed'
+                          : 'hover:bg-[#fdfaf5] text-[#5d4037]'
                       }`}
                     >
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] ${
-                        params.lessonId === lesson._id ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-500'
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        lessonId === lesson._id ? 'bg-white/20' : 'bg-[#d7ccc8]/30'
                       }`}>
-                        ▶
+                        <span className="text-xs">▶</span>
                       </div>
-                      <span className={`text-sm font-medium ${
-                        params.lessonId === lesson._id ? 'text-violet-400' : 'text-slate-400'
-                      }`}>
-                        {lesson.title}
-                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-bold truncate ${lessonId === lesson._id ? 'text-white' : 'text-[#3e2723]'}`}>
+                          {lesson.title}
+                        </p>
+                      </div>
+                      {lesson.isPreview && !user?.isPaid && (
+                        <span className="text-[8px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full border border-green-200 uppercase">Libre</span>
+                      )}
                     </button>
                   ))}
                 </div>
@@ -204,7 +213,54 @@ export default function CoursePlayerPage() {
             ))}
           </div>
         </div>
-      </main>
+
+        {/* Reproductor Principal */}
+        <div className="flex-1 bg-[#fdfaf5] p-6 lg:p-12 overflow-y-auto">
+          <div className="max-w-4xl mx-auto">
+            {/* Video Placeholder / Container */}
+            <div className="relative aspect-video bg-black rounded-[40px] overflow-hidden shadow-2xl mb-10 border-8 border-white">
+              {currentLesson ? (
+                <div className="absolute inset-0 flex items-center justify-center text-white">
+                  <div className="text-center p-8">
+                    <p className="text-xl font-bold mb-4">Reproductor de Video</p>
+                    <p className="text-slate-400 text-sm">{currentLesson.videoUrl}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-white">
+                  Selecciona una lección
+                </div>
+              )}
+            </div>
+
+            {currentLesson && (
+              <div className="animate-fade-in">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8">
+                  <div>
+                    <h1 className="text-3xl lg:text-4xl font-black text-[#3e2723] mb-2">{currentLesson.title}</h1>
+                    <p className="text-[#b04b2b] font-bold text-sm uppercase tracking-widest">Lección en curso</p>
+                  </div>
+                  <Button 
+                    variant={completed ? 'secondary' : 'primary'} 
+                    onClick={toggleComplete}
+                    disabled={completed}
+                    className="rounded-full px-8 border-[#d7ccc8] text-[#3e2723] hover:bg-white"
+                  >
+                    {completed ? '✓ Completada' : 'Marcar como completada'}
+                  </Button>
+                </div>
+                
+                <div className="bg-white border border-[#d7ccc8] rounded-[40px] p-8 lg:p-10 shadow-sm">
+                  <h3 className="text-xl font-black text-[#3e2723] mb-6">Descripción del proyecto</h3>
+                  <div className="prose prose-stone max-w-none text-[#5d4037] leading-relaxed">
+                    {currentLesson.description || 'No hay descripción disponible para esta lección.'}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

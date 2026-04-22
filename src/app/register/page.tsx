@@ -47,28 +47,29 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#fdfaf5] px-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-violet-600/10 blur-[120px]" />
-        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-indigo-600/10 blur-[120px]" />
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-[#e9a68a]/10 blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-[#b04b2b]/10 blur-[120px]" />
       </div>
 
       <div className="w-full max-w-md relative">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center">
-              <span className="text-white font-bold">C</span>
+          <Link href="/" className="inline-flex items-center gap-3 mb-6">
+            <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain" />
+            <div className="flex flex-col text-left">
+              <span className="text-[#3e2723] font-bold text-xl leading-none">La Mackenna</span>
+              <span className="text-[#b04b2b] text-[10px] font-bold tracking-widest uppercase">Academia</span>
             </div>
-            <span className="text-white font-bold text-xl">CursoMax</span>
           </Link>
-          <h1 className="text-2xl font-bold text-white">Crea tu cuenta</h1>
-          <p className="text-slate-400 mt-2">Empieza tu camino como desarrollador hoy mismo.</p>
+          <h1 className="text-3xl font-black text-[#3e2723]">Crea tu cuenta</h1>
+          <p className="text-[#8d6e63] mt-3 font-medium">Únete a nuestra comunidad de artesanas.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-slate-900/50 border border-slate-800 p-8 rounded-3xl backdrop-blur-xl space-y-5">
+        <form onSubmit={handleSubmit} className="bg-white border border-[#d7ccc8] p-10 rounded-[40px] shadow-2xl shadow-[#b04b2b]/5 space-y-6">
           <Input
             label="Nombre completo"
-            placeholder="Juan Pérez"
+            placeholder="Tu nombre"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -76,7 +77,7 @@ export default function RegisterPage() {
           <Input
             label="Email"
             type="email"
-            placeholder="tu@email.com"
+            placeholder="hola@tuemail.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -90,13 +91,13 @@ export default function RegisterPage() {
             required
           />
           
-          <Button type="submit" className="w-full py-4" loading={loading}>
-            Registrarse
+          <Button type="submit" className="w-full py-4 text-lg" loading={loading}>
+            Registrarme ahora
           </Button>
 
-          <p className="text-center text-sm text-slate-400">
+          <p className="text-center text-sm text-[#8d6e63] font-medium">
             ¿Ya tienes cuenta?{' '}
-            <Link href="/login" className="text-violet-400 hover:underline font-semibold">
+            <Link href="/login" className="text-[#b04b2b] hover:underline font-bold">
               Inicia sesión
             </Link>
           </p>
