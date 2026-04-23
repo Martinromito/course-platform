@@ -49,10 +49,10 @@ function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#fdfaf5] px-5 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-[#FAF9F6] px-5 py-8">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-[#e9a68a]/10 blur-[120px]" />
-        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-[#b04b2b]/10 blur-[120px]" />
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-[#C5A059]/10 blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-[#8B7355]/10 blur-[120px]" />
       </div>
 
       <div className="w-full max-w-md relative">
@@ -60,15 +60,15 @@ function RegisterForm() {
           <Link href="/" className="inline-flex items-center gap-2.5 sm:gap-3 mb-5 sm:mb-6">
             <img src="/logo.png" alt="Logo" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
             <div className="flex flex-col text-left">
-              <span className="text-[#3e2723] font-bold text-lg sm:text-xl leading-none">La Mackenna</span>
-              <span className="text-[#b04b2b] text-[9px] sm:text-[10px] font-bold tracking-widest uppercase">Academia</span>
+              <span className="text-[#1A1A1A] font-bold text-lg sm:text-xl leading-none">La Mackenna</span>
+              <span className="text-[#8B7355] text-[9px] sm:text-[10px] font-bold tracking-widest uppercase">Academia</span>
             </div>
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#3e2723]">Crea tu cuenta</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#1A1A1A]">Crea tu cuenta</h1>
           <p className="text-[#8d6e63] mt-2 sm:mt-3 font-medium text-sm sm:text-base">Únete a nuestra comunidad de artesanas.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white border border-[#d7ccc8] p-6 sm:p-10 rounded-[28px] sm:rounded-[40px] shadow-2xl shadow-[#b04b2b]/5 space-y-5 sm:space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white border border-[#E5E0D8] p-6 sm:p-10 rounded-[28px] sm:rounded-[40px] shadow-2xl shadow-[#b04b2b]/5 space-y-5 sm:space-y-6">
           <Input
             label="Nombre completo"
             placeholder="Tu nombre"
@@ -99,7 +99,7 @@ function RegisterForm() {
 
           <p className="text-center text-sm text-[#8d6e63] font-medium">
             ¿Ya tienes cuenta?{' '}
-            <Link href="/login" className="text-[#b04b2b] hover:underline font-bold">
+            <Link href="/login" className="text-[#8B7355] hover:underline font-bold">
               Inicia sesión
             </Link>
           </p>
@@ -112,7 +112,7 @@ function RegisterForm() {
 export default function RegisterPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#fdfaf5] flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#b04b2b]"></div>
       </div>
     }>

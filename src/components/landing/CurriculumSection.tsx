@@ -65,13 +65,13 @@ export default function CurriculumSection() {
     <section id="contenido" className="py-16 sm:py-24 bg-white">
       <div className="max-w-4xl mx-auto px-5 sm:px-6">
         <div className="text-center mb-10 sm:mb-16">
-          <span className="text-[#b04b2b] text-xs sm:text-sm font-bold uppercase tracking-widest">
+          <span className="text-[#8B7355] text-xs sm:text-sm font-bold uppercase tracking-widest">
             Qué vas a aprender
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#3e2723] mt-3 mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1A1A1A] mt-3 mb-4">
             Proyectos del curso
           </h2>
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mt-4 text-[#8d6e63] text-xs sm:text-sm">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mt-4 text-[#705E45] text-xs sm:text-sm">
             <span>🧵 {modules.length} módulos</span>
             <span>🎥 Videos paso a paso</span>
             <span>📥 Moldes incluidos</span>
@@ -82,19 +82,19 @@ export default function CurriculumSection() {
           {modules.map((mod, idx) => (
             <div
               key={idx}
-              className="border border-[#d7ccc8] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#fdfaf5] hover:border-[#b04b2b]/30 transition-colors shadow-sm"
+              className="border border-[#E5E0D8] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#FAF9F6] hover:border-[#b04b2b]/30 transition-colors shadow-sm"
             >
               <button
                 onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
                 className="w-full flex items-center justify-between p-4 sm:p-6 text-left"
               >
                 <div className="flex items-center gap-3 sm:gap-5 min-w-0">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[#b04b2b]/10 border border-[#b04b2b]/20 flex items-center justify-center text-[#b04b2b] font-bold text-base sm:text-lg flex-shrink-0">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[#8B7355]/10 border border-[#b04b2b]/20 flex items-center justify-center text-[#8B7355] font-bold text-base sm:text-lg flex-shrink-0">
                     {idx + 1}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-[#3e2723] font-bold text-sm sm:text-lg leading-snug truncate">{mod.title}</h3>
-                    <span className="text-[#8d6e63] text-[10px] sm:text-xs uppercase tracking-wider font-semibold">{mod.duration}</span>
+                    <h3 className="text-[#1A1A1A] font-bold text-sm sm:text-lg leading-snug truncate">{mod.title}</h3>
+                    <span className="text-[#705E45] text-[10px] sm:text-xs uppercase tracking-wider font-semibold">{mod.duration}</span>
                   </div>
                 </div>
                 <svg
@@ -106,11 +106,11 @@ export default function CurriculumSection() {
               </button>
 
               {openIdx === idx && (
-                <div className="border-t border-[#d7ccc8] px-4 sm:px-6 pb-4 sm:pb-6 pt-2">
+                <div className="border-t border-[#E5E0D8] px-4 sm:px-6 pb-4 sm:pb-6 pt-2">
                   <ul className="space-y-2.5 sm:space-y-3 mt-3 sm:mt-4">
                     {mod.lessons.map((lesson, li) => (
-                      <li key={li} className="flex items-start gap-3 sm:gap-4 text-[#5d4037] text-sm">
-                        <div className="w-2 h-2 rounded-full bg-[#e9a68a] mt-1.5 flex-shrink-0" />
+                      <li key={li} className="flex items-start gap-3 sm:gap-4 text-[#4A4A4A] text-sm">
+                        <div className="w-2 h-2 rounded-full bg-[#C5A059] mt-1.5 flex-shrink-0" />
                         <span>{lesson}</span>
                       </li>
                     ))}

@@ -49,7 +49,7 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled || menuOpen
-          ? 'bg-white/95 backdrop-blur-xl border-b border-[#d7ccc8] shadow-md'
+          ? 'bg-white/95 backdrop-blur-xl border-b border-[#E5E0D8] shadow-md'
           : 'bg-transparent'
       }`}
     >
@@ -67,13 +67,13 @@ export default function Navbar() {
                   (e.target as any).nextSibling.style.display = 'flex';
                 }}
               />
-              <div className="hidden w-full h-full rounded-full bg-[#b04b2b] items-center justify-center text-white font-bold text-lg">
+              <div className="hidden w-full h-full rounded-full bg-[#8B7355] items-center justify-center text-white font-bold text-lg">
                 M
               </div>
             </div>
             <div className="flex flex-col">
-              <span className="text-[#3e2723] font-bold text-base sm:text-xl leading-none">La Mackenna</span>
-              <span className="text-[#b04b2b] text-[9px] sm:text-[10px] font-semibold tracking-widest uppercase">Productos Artesanales</span>
+              <span className="text-[#1A1A1A] font-bold text-base sm:text-xl leading-none">La Mackenna</span>
+              <span className="text-[#8B7355] text-[9px] sm:text-[10px] font-semibold tracking-widest uppercase">Productos Artesanales</span>
             </div>
           </Link>
 
@@ -83,7 +83,7 @@ export default function Navbar() {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-[#5d4037] hover:text-[#b04b2b] transition-colors text-sm font-medium"
+                className="text-[#4A4A4A] hover:text-[#8B7355] transition-colors text-sm font-medium"
               >
                 {link.label}
               </a>
@@ -160,7 +160,7 @@ export default function Navbar() {
           menuOpen ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="bg-white/95 backdrop-blur-xl border-t border-[#d7ccc8] px-4 pb-6 pt-4">
+        <div className="bg-white/95 backdrop-blur-xl border-t border-[#E5E0D8] px-4 pb-6 pt-4">
           {/* Nav links */}
           <div className="space-y-1 mb-6">
             {navLinks.map((link) => (
@@ -168,7 +168,7 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="block px-4 py-3 rounded-2xl text-[#5d4037] hover:bg-[#efebe9] hover:text-[#b04b2b] transition-colors font-semibold text-base"
+                className="block px-4 py-3 rounded-2xl text-[#4A4A4A] hover:bg-[#efebe9] hover:text-[#8B7355] transition-colors font-semibold text-base"
               >
                 {link.label}
               </a>
@@ -176,10 +176,10 @@ export default function Navbar() {
           </div>
 
           {/* Auth section */}
-          <div className="border-t border-[#d7ccc8] pt-4 space-y-3">
+          <div className="border-t border-[#E5E0D8] pt-4 space-y-3">
             {user ? (
               <>
-                <p className="text-xs text-[#8d6e63] font-medium px-4 mb-2">Sesión de {user.name}</p>
+                <p className="text-xs text-[#705E45] font-medium px-4 mb-2">Sesión de {user.name}</p>
                 {user.role === 'admin' && (
                   <Link href="/admin" onClick={() => setMenuOpen(false)}>
                     <Button variant="outline" className="w-full" size="md">Panel Admin</Button>

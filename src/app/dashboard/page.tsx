@@ -27,6 +27,14 @@ export default function DashboardPage() {
   const router = useRouter();
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({});
+
+  const toggleModule = (id: string) => {
+    setExpandedModules(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -152,7 +160,7 @@ export default function DashboardPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-[#fdfaf5] flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#b04b2b]"></div>
       </div>
     );
@@ -161,17 +169,17 @@ export default function DashboardPage() {
   // Si es admin, mostrar la vista de administrador
   if (user?.role === 'admin') {
     return (
-      <div className="min-h-screen bg-[#fdfaf5]">
+      <div className="min-h-screen bg-[#FAF9F6]">
         <Navbar />
         <main className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-16 sm:pb-20">
           
           {/* HEADER DASHBOARD / EDITOR */}
           <div className="mb-8 sm:mb-12 flex flex-col md:flex-row md:justify-between md:items-end gap-4 sm:gap-6">
             <div>
-              <h1 className="text-2xl sm:text-4xl font-black text-[#3e2723]">
+              <h1 className="text-2xl sm:text-4xl font-black text-[#1A1A1A]">
                 {editingModule ? 'Editando Módulo' : 'Panel de Control 🛠️'}
               </h1>
-              <p className="text-[#8d6e63] mt-2 sm:mt-3 font-medium text-sm sm:text-lg">
+              <p className="text-[#705E45] mt-2 sm:mt-3 font-medium text-sm sm:text-lg">
                 {editingModule ? `Ajustando los detalles de "${editingModule.title}"` : `Bienvenida, ${user?.name}. Aquí puedes gestionar tu academia.`}
               </p>
             </div>
@@ -191,25 +199,25 @@ export default function DashboardPage() {
             /* VISTA DEL EDITOR */
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               {/* Información General del Módulo */}
-              <div className="bg-white border border-[#d7ccc8] rounded-[28px] sm:rounded-[40px] p-6 sm:p-10 shadow-sm">
-                <h2 className="text-2xl font-black text-[#3e2723] mb-8 flex items-center gap-3">
-                  <span className="w-10 h-10 rounded-xl bg-[#fdfaf5] flex items-center justify-center text-xl">📁</span>
+              <div className="bg-white border border-[#E5E0D8] rounded-[28px] sm:rounded-[40px] p-6 sm:p-10 shadow-sm">
+                <h2 className="text-2xl font-black text-[#1A1A1A] mb-8 flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-[#FAF9F6] flex items-center justify-center text-xl">📁</span>
                   Información General
                 </h2>
                 <div className="grid grid-cols-1 gap-8">
                   <div className="space-y-2">
-                    <label className="text-xs font-black uppercase tracking-widest text-[#b04b2b]">Título del Módulo</label>
+                    <label className="text-xs font-black uppercase tracking-widest text-[#8B7355]">Título del Módulo</label>
                     <input 
                       type="text" 
-                      className="w-full bg-[#fdfaf5] border border-[#d7ccc8] rounded-2xl px-6 py-4 text-[#3e2723] font-bold focus:outline-none focus:ring-2 focus:ring-[#b04b2b]/20"
+                      className="w-full bg-[#FAF9F6] border border-[#E5E0D8] rounded-2xl px-6 py-4 text-[#1A1A1A] font-bold focus:outline-none focus:ring-2 focus:ring-[#b04b2b]/20"
                       value={editingModule.title}
                       onChange={(e) => setEditingModule({...editingModule, title: e.target.value})}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black uppercase tracking-widest text-[#b04b2b]">Descripción</label>
+                    <label className="text-xs font-black uppercase tracking-widest text-[#8B7355]">Descripción</label>
                     <textarea 
-                      className="w-full bg-[#fdfaf5] border border-[#d7ccc8] rounded-2xl px-6 py-4 text-[#3e2723] font-medium min-h-[120px] focus:outline-none focus:ring-2 focus:ring-[#b04b2b]/20"
+                      className="w-full bg-[#FAF9F6] border border-[#E5E0D8] rounded-2xl px-6 py-4 text-[#1A1A1A] font-medium min-h-[120px] focus:outline-none focus:ring-2 focus:ring-[#b04b2b]/20"
                       value={editingModule.description}
                       onChange={(e) => setEditingModule({...editingModule, description: e.target.value})}
                       placeholder="Describe de qué trata este módulo..."
@@ -219,10 +227,10 @@ export default function DashboardPage() {
               </div>
 
               {/* Listado de Lecciones */}
-              <div className="bg-white border border-[#d7ccc8] rounded-[28px] sm:rounded-[40px] p-6 sm:p-10 shadow-sm">
+              <div className="bg-white border border-[#E5E0D8] rounded-[28px] sm:rounded-[40px] p-6 sm:p-10 shadow-sm">
                 <div className="flex justify-between items-center mb-10">
-                  <h2 className="text-2xl font-black text-[#3e2723] flex items-center gap-3">
-                    <span className="w-10 h-10 rounded-xl bg-[#fdfaf5] flex items-center justify-center text-xl">🎬</span>
+                  <h2 className="text-2xl font-black text-[#1A1A1A] flex items-center gap-3">
+                    <span className="w-10 h-10 rounded-xl bg-[#FAF9F6] flex items-center justify-center text-xl">🎬</span>
                     Lecciones del Módulo
                   </h2>
                   <Button variant="outline" size="sm" onClick={addLesson}>+ Añadir Lección</Button>
@@ -230,9 +238,9 @@ export default function DashboardPage() {
 
                 <div className="space-y-6">
                   {editingModule.lessons?.map((lesson: any, index: number) => (
-                    <div key={lesson._id} className="p-5 sm:p-8 bg-[#fdfaf5] border border-[#d7ccc8] rounded-2xl sm:rounded-3xl relative group">
+                    <div key={lesson._id} className="p-5 sm:p-8 bg-[#FAF9F6] border border-[#E5E0D8] rounded-2xl sm:rounded-3xl relative group">
                       <div className="flex justify-between items-start mb-6">
-                        <span className="bg-[#b04b2b] text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm">
+                        <span className="bg-[#8B7355] text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm">
                           {index + 1}
                         </span>
                         <button 
@@ -244,29 +252,29 @@ export default function DashboardPage() {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-[#8d6e63]">Título de la clase</label>
+                          <label className="text-[10px] font-black uppercase tracking-widest text-[#705E45]">Título de la clase</label>
                           <input 
                             type="text" 
-                            className="w-full bg-white border border-[#d7ccc8] rounded-xl px-4 py-3 text-[#3e2723] font-bold text-sm focus:outline-none"
+                            className="w-full bg-white border border-[#E5E0D8] rounded-xl px-4 py-3 text-[#1A1A1A] font-bold text-sm focus:outline-none"
                             value={lesson.title}
                             onChange={(e) => updateLesson(index, 'title', e.target.value)}
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-[#8d6e63]">URL de Video (YouTube)</label>
+                          <label className="text-[10px] font-black uppercase tracking-widest text-[#705E45]">URL de Video (YouTube)</label>
                           <input 
                             type="text" 
-                            className="w-full bg-white border border-[#d7ccc8] rounded-xl px-4 py-3 text-[#3e2723] font-medium text-sm focus:outline-none"
+                            className="w-full bg-white border border-[#E5E0D8] rounded-xl px-4 py-3 text-[#1A1A1A] font-medium text-sm focus:outline-none"
                             placeholder="https://www.youtube.com/watch?v=..."
                             value={lesson.videoUrl}
                             onChange={(e) => updateLesson(index, 'videoUrl', e.target.value)}
                           />
                         </div>
                         <div className="md:col-span-2 space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-[#8d6e63]">Descripción corta</label>
+                          <label className="text-[10px] font-black uppercase tracking-widest text-[#705E45]">Descripción corta</label>
                           <input 
                             type="text" 
-                            className="w-full bg-white border border-[#d7ccc8] rounded-xl px-4 py-3 text-[#3e2723] font-medium text-sm focus:outline-none"
+                            className="w-full bg-white border border-[#E5E0D8] rounded-xl px-4 py-3 text-[#1A1A1A] font-medium text-sm focus:outline-none"
                             value={lesson.description}
                             onChange={(e) => updateLesson(index, 'description', e.target.value)}
                           />
@@ -279,15 +287,15 @@ export default function DashboardPage() {
                             onChange={(e) => updateLesson(index, 'isPreview', e.target.checked)}
                             className="w-4 h-4 accent-[#b04b2b]"
                           />
-                          <label htmlFor={`preview-${index}`} className="text-xs font-bold text-[#3e2723]">Clase abierta (gratis para todos)</label>
+                          <label htmlFor={`preview-${index}`} className="text-xs font-bold text-[#1A1A1A]">Clase abierta (gratis para todos)</label>
                         </div>
                       </div>
                     </div>
                   ))}
                   
                   {(!editingModule.lessons || editingModule.lessons.length === 0) && (
-                    <div className="py-12 text-center border-2 border-dashed border-[#d7ccc8] rounded-3xl">
-                      <p className="text-[#8d6e63]">No hay lecciones en este módulo. Comienza añadiendo una.</p>
+                    <div className="py-12 text-center border-2 border-dashed border-[#E5E0D8] rounded-3xl">
+                      <p className="text-[#705E45]">No hay lecciones en este módulo. Comienza añadiendo una.</p>
                     </div>
                   )}
                 </div>
@@ -297,37 +305,37 @@ export default function DashboardPage() {
             /* VISTA DEL LISTADO (Anterior) */
             <>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
-                <div className="bg-white border border-[#d7ccc8] p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-sm">
-                  <span className="text-xs sm:text-sm font-bold text-[#b04b2b] uppercase tracking-widest">Alumnos Totales</span>
-                  <div className="text-3xl sm:text-4xl font-black text-[#3e2723] mt-2">1,248</div>
+                <div className="bg-white border border-[#E5E0D8] p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#8B7355] uppercase tracking-widest">Alumnos Totales</span>
+                  <div className="text-3xl sm:text-4xl font-black text-[#1A1A1A] mt-2">1,248</div>
                 </div>
-                <div className="bg-white border border-[#d7ccc8] p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-sm">
-                  <span className="text-xs sm:text-sm font-bold text-[#b04b2b] uppercase tracking-widest">Módulos</span>
-                  <div className="text-3xl sm:text-4xl font-black text-[#3e2723] mt-2">{modules.length}</div>
+                <div className="bg-white border border-[#E5E0D8] p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#8B7355] uppercase tracking-widest">Módulos</span>
+                  <div className="text-3xl sm:text-4xl font-black text-[#1A1A1A] mt-2">{modules.length}</div>
                 </div>
-                <div className="bg-white border border-[#d7ccc8] p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-sm">
-                  <span className="text-xs sm:text-sm font-bold text-[#b04b2b] uppercase tracking-widest">Ingresos Mes</span>
-                  <div className="text-3xl sm:text-4xl font-black text-[#3e2723] mt-2">$45,200</div>
+                <div className="bg-white border border-[#E5E0D8] p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#8B7355] uppercase tracking-widest">Ingresos Mes</span>
+                  <div className="text-3xl sm:text-4xl font-black text-[#1A1A1A] mt-2">$45,200</div>
                 </div>
               </div>
 
-              <div className="bg-white border border-[#d7ccc8] rounded-[28px] sm:rounded-[40px] overflow-hidden shadow-xl shadow-[#b04b2b]/5">
-                <div className="p-5 sm:p-8 border-b border-[#d7ccc8] flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center bg-[#fdfaf5]">
-                  <h2 className="text-xl sm:text-2xl font-black text-[#3e2723]">Gestión de Contenido</h2>
+              <div className="bg-white border border-[#E5E0D8] rounded-[28px] sm:rounded-[40px] overflow-hidden shadow-xl shadow-[#b04b2b]/5">
+                <div className="p-5 sm:p-8 border-b border-[#E5E0D8] flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center bg-[#FAF9F6]">
+                  <h2 className="text-xl sm:text-2xl font-black text-[#1A1A1A]">Gestión de Contenido</h2>
                   <Button size="sm" onClick={addModule}>+ Nuevo Módulo</Button>
                 </div>
                 
-                <div className="divide-y divide-[#d7ccc8]">
+                <div className="divide-y divide-[#E5E0D8]">
                   {modules.length > 0 ? (
                     modules.map((mod, idx) => (
-                      <div key={mod._id} className="p-5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 hover:bg-[#fdfaf5]/50 transition-colors">
+                      <div key={mod._id} className="p-5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 hover:bg-[#FAF9F6]/50 transition-colors">
                         <div className="flex gap-4 sm:gap-6 items-center">
-                          <div className="w-11 h-11 sm:w-14 sm:h-14 bg-[#e9a68a]/20 rounded-xl sm:rounded-2xl flex items-center justify-center text-[#b04b2b] font-black text-lg sm:text-xl flex-shrink-0">
+                          <div className="w-11 h-11 sm:w-14 sm:h-14 bg-[#C5A059]/20 rounded-xl sm:rounded-2xl flex items-center justify-center text-[#8B7355] font-black text-lg sm:text-xl flex-shrink-0">
                             {idx + 1}
                           </div>
                           <div>
-                            <h3 className="font-bold text-[#3e2723] text-base sm:text-xl">{mod.title}</h3>
-                            <p className="text-[#8d6e63] text-sm mt-1">{mod.lessons?.length || 0} lecciones configuradas</p>
+                            <h3 className="font-bold text-[#1A1A1A] text-base sm:text-xl">{mod.title}</h3>
+                            <p className="text-[#705E45] text-sm mt-1">{mod.lessons?.length || 0} lecciones configuradas</p>
                           </div>
                         </div>
                         <div className="flex gap-3">
@@ -337,7 +345,7 @@ export default function DashboardPage() {
                       </div>
                     ))
                   ) : (
-                    <div className="p-20 text-center text-[#8d6e63]">
+                    <div className="p-20 text-center text-[#705E45]">
                       No hay módulos creados. Haz clic en "+ Nuevo Módulo" para empezar.
                     </div>
                   )}
@@ -352,20 +360,20 @@ export default function DashboardPage() {
 
   // Vista de Estudiante (Ya existente)
   return (
-    <div className="min-h-screen bg-[#fdfaf5]">
+    <div className="min-h-screen bg-[#FAF9F6]">
       <Navbar />
       
       <main className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-16 sm:pb-20">
         <div className="mb-8 sm:mb-12">
-          <h1 className="text-2xl sm:text-4xl font-black text-[#3e2723]">¡Hola de nuevo, {user?.name}! 👋</h1>
-          <p className="text-[#8d6e63] mt-2 sm:mt-3 font-medium text-sm sm:text-lg">Es un gran día para seguir creando algo hermoso.</p>
+          <h1 className="text-2xl sm:text-4xl font-black text-[#1A1A1A]">¡Hola de nuevo, {user?.name}! 👋</h1>
+          <p className="text-[#705E45] mt-2 sm:mt-3 font-medium text-sm sm:text-lg">Es un gran día para seguir creando algo hermoso.</p>
         </div>
 
         {!user?.isPaid ? (
-          <div className="bg-white border border-[#d7ccc8] rounded-[28px] sm:rounded-[40px] p-8 sm:p-12 text-center shadow-xl shadow-[#b04b2b]/5">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#e9a68a]/20 rounded-full flex items-center justify-center mx-auto mb-5 sm:mb-6 text-2xl sm:text-3xl">🔒</div>
-            <h2 className="text-2xl sm:text-3xl font-black text-[#3e2723] mb-3 sm:mb-4">Acceso Limitado</h2>
-            <p className="text-[#5d4037] max-w-2xl mx-auto mb-8 sm:mb-10 text-base sm:text-lg leading-relaxed">
+          <div className="bg-white border border-[#E5E0D8] rounded-[28px] sm:rounded-[40px] p-8 sm:p-12 text-center shadow-xl shadow-[#b04b2b]/5">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#C5A059]/20 rounded-full flex items-center justify-center mx-auto mb-5 sm:mb-6 text-2xl sm:text-3xl">🔒</div>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#1A1A1A] mb-3 sm:mb-4">Acceso Limitado</h2>
+            <p className="text-[#4A4A4A] max-w-2xl mx-auto mb-8 sm:mb-10 text-base sm:text-lg leading-relaxed">
               Tu cuenta está activa, pero aún no tienes acceso completo a la academia. 
               Inscríbete hoy para desbloquear todos los proyectos y empezar a aprender con nosotros.
             </p>
@@ -376,57 +384,84 @@ export default function DashboardPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="lg:col-span-2 space-y-8">
-              <h2 className="text-2xl font-black text-[#3e2723]">Tu Contenido</h2>
+              <h2 className="text-2xl font-black text-[#1A1A1A]">Tu Contenido</h2>
               {modules.length > 0 ? (
-                modules.map((mod, idx) => (
-                  <div key={mod._id} className="bg-white border border-[#d7ccc8] rounded-3xl overflow-hidden shadow-sm">
-                    <div className="p-6 border-b border-[#d7ccc8] bg-[#fdfaf5] flex justify-between items-center">
-                      <h3 className="font-bold text-[#3e2723] text-lg">Módulo {idx + 1}: {mod.title}</h3>
-                      <span className="text-xs font-bold text-[#b04b2b] uppercase tracking-widest">{mod.lessons.length} lecciones</span>
-                    </div>
-                    <div className="divide-y divide-[#d7ccc8]">
-                      {mod.lessons.map((lesson) => (
-                        <button
-                          key={lesson._id}
-                          onClick={() => router.push(`/dashboard/course/${mod._id}/${lesson._id}`)}
-                          className="w-full flex items-center justify-between p-5 hover:bg-[#fdfaf5] transition-colors text-left group"
-                        >
-                          <div className="flex items-center gap-5">
-                            <div className="w-10 h-10 rounded-xl bg-[#d7ccc8]/30 flex items-center justify-center text-[#b04b2b] group-hover:bg-[#b04b2b] group-hover:text-white transition-all">
-                              ▶
-                            </div>
-                            <div>
-                              <span className="text-[#3e2723] font-bold group-hover:text-[#b04b2b] transition-colors">{lesson.title}</span>
-                            </div>
+                modules.map((mod, idx) => {
+                  const isExpanded = expandedModules[mod._id];
+                  return (
+                    <div key={mod._id} className="bg-white border border-[#E5E0D8] rounded-[32px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                      <button 
+                        onClick={() => toggleModule(mod._id)}
+                        className="w-full p-6 sm:p-8 bg-[#FAF9F6] flex justify-between items-center text-left group"
+                      >
+                        <div className="flex items-center gap-4 sm:gap-6">
+                          <div className="w-12 h-12 rounded-2xl bg-[#C5A059]/20 flex items-center justify-center text-[#8B7355] font-black text-xl group-hover:scale-110 transition-transform">
+                            {idx + 1}
                           </div>
-                          {lesson.isPreview && !user?.isPaid && (
-                            <span className="text-[10px] font-bold bg-green-100 text-green-700 px-3 py-1 rounded-full uppercase tracking-wider">
-                              Clase abierta
-                            </span>
-                          )}
-                        </button>
-                      ))}
+                          <div>
+                            <h3 className="font-bold text-[#1A1A1A] text-lg sm:text-xl group-hover:text-[#8B7355] transition-colors">{mod.title}</h3>
+                            <span className="text-xs font-bold text-[#8B7355] uppercase tracking-widest">{mod.lessons.length} lecciones</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className="hidden sm:inline-block text-xs font-black text-[#705E45] uppercase tracking-widest">{isExpanded ? 'Ver menos' : 'Ver contenido'}</span>
+                          <div className={`w-10 h-10 rounded-full bg-white border border-[#E5E0D8] flex items-center justify-center text-[#8B7355] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
+                        </div>
+                      </button>
+                      
+                      <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                        <div className="divide-y divide-[#E5E0D8]/30 border-t border-[#E5E0D8]">
+                          {mod.lessons.map((lesson) => (
+                            <button
+                              key={lesson._id}
+                              onClick={() => router.push(`/dashboard/course/${mod._id}/${lesson._id}`)}
+                              className="w-full flex items-center justify-between p-5 sm:p-6 hover:bg-[#FAF9F6] transition-colors text-left group/lesson"
+                            >
+                              <div className="flex items-center gap-5">
+                                <div className="w-10 h-10 rounded-xl bg-[#d7ccc8]/20 flex items-center justify-center text-[#8B7355] group-hover/lesson:bg-[#8B7355] group-hover/lesson:text-white transition-all">
+                                  <span className="text-xs">▶</span>
+                                </div>
+                                <div>
+                                  <span className="text-[#1A1A1A] font-bold group-hover/lesson:text-[#8B7355] transition-colors">{lesson.title}</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                {lesson.isPreview && !user?.isPaid && (
+                                  <span className="text-[10px] font-bold bg-green-100 text-green-700 px-3 py-1 rounded-full uppercase tracking-wider border border-green-200">
+                                    Clase abierta
+                                  </span>
+                                )}
+                                <span className="text-[#8B7355] font-bold text-xs opacity-0 group-hover/lesson:opacity-100 transition-opacity">Comenzar →</span>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
-                <div className="bg-white border border-[#d7ccc8] rounded-3xl p-12 text-center">
-                  <p className="text-[#8d6e63]">No hay contenido disponible todavía.</p>
+                <div className="bg-white border border-[#E5E0D8] rounded-3xl p-12 text-center">
+                  <p className="text-[#705E45]">No hay contenido disponible todavía.</p>
                 </div>
               )}
             </div>
 
             <div className="space-y-8">
-              <div className="bg-white border border-[#d7ccc8] rounded-3xl p-8 shadow-sm">
-                <h2 className="text-xl font-black text-[#3e2723] mb-6">Tu progreso</h2>
-                <div className="w-full bg-[#fdfaf5] rounded-full h-3 mb-3 border border-[#d7ccc8]/30">
-                  <div className="bg-[#b04b2b] h-full rounded-full w-[10%] shadow-lg shadow-[#b04b2b]/20"></div>
+              <div className="bg-white border border-[#E5E0D8] rounded-3xl p-8 shadow-sm">
+                <h2 className="text-xl font-black text-[#1A1A1A] mb-6">Tu progreso</h2>
+                <div className="w-full bg-[#FAF9F6] rounded-full h-3 mb-3 border border-[#E5E0D8]/30">
+                  <div className="bg-[#8B7355] h-full rounded-full w-[10%] shadow-lg shadow-[#b04b2b]/20"></div>
                 </div>
-                <p className="text-sm font-bold text-[#8d6e63]">10% completado</p>
+                <p className="text-sm font-bold text-[#705E45]">10% completado</p>
                 
-                <div className="mt-8 pt-8 border-t border-[#d7ccc8]">
-                  <h3 className="text-sm font-black text-[#3e2723] uppercase tracking-widest mb-4">Ayuda Personalizada</h3>
-                  <p className="text-sm text-[#5d4037] mb-6 leading-relaxed">¿Tienes dudas con algún proyecto? Estamos aquí para ayudarte.</p>
+                <div className="mt-8 pt-8 border-t border-[#E5E0D8]">
+                  <h3 className="text-sm font-black text-[#1A1A1A] uppercase tracking-widest mb-4">Ayuda Personalizada</h3>
+                  <p className="text-sm text-[#4A4A4A] mb-6 leading-relaxed">¿Tienes dudas con algún proyecto? Estamos aquí para ayudarte.</p>
                   <Button variant="outline" size="md" className="w-full">
                     Enviar mensaje
                   </Button>

@@ -5,11 +5,13 @@
 }
 
 :root {
-  --background: #fdfaf5; /* Crema muy suave */
-  --foreground: #3e2723; /* Marrón café oscuro */
-  --primary: #b04b2b;    /* Terracota del logo */
-  --secondary: #e9a68a;  /* Melocotón/Arena del logo */
-  --accent: #d7ccc8;     /* Lino/Beige claro */
+  --background: #FAF9F6; /* Alabaster/Bone */
+  --foreground: #1A1A1A; /* Onyx */
+  --primary: #8B7355;    /* Antique Bronze */
+  --secondary: #C5A059;  /* Muted Gold */
+  --accent: #F2F0ED;     /* Warm Mist */
+  --card-bg: #FFFFFF;
+  --border-color: #E5E0D8;
 }
 
 html {

@@ -13,9 +13,9 @@ export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 sm:pt-16 pb-12">
       {/* Fondo con tonos cálidos y texturas orgánicas */}
-      <div className="absolute inset-0 bg-[#fdfaf5]">
-        <div className="absolute top-1/4 left-1/4 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-[#e9a68a]/10 rounded-full blur-[80px] sm:blur-[100px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-[#b04b2b]/10 rounded-full blur-[80px] sm:blur-[100px] animate-pulse delay-1000" />
+      <div className="absolute inset-0 bg-[#FAF9F6]">
+        <div className="absolute top-1/4 left-1/4 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-[#C5A059]/10 rounded-full blur-[80px] sm:blur-[100px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-[#8B7355]/10 rounded-full blur-[80px] sm:blur-[100px] animate-pulse delay-1000" />
       </div>
 
       {/* Papel texture overlay */}
@@ -29,21 +29,21 @@ export default function HeroSection() {
       <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-6 flex flex-col lg:flex-row items-center gap-8 sm:gap-12 text-center lg:text-left">
         <div className="flex-1">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#b04b2b]/20 bg-[#b04b2b]/5 text-[#b04b2b] text-xs sm:text-sm font-medium mb-6 sm:mb-8 animate-fade-in">
-            <span className="w-2 h-2 rounded-full bg-[#b04b2b] animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#8B7355]/20 bg-[#8B7355]/5 text-[#8B7355] text-xs sm:text-sm font-medium mb-6 sm:mb-8 animate-fade-in">
+            <span className="w-2 h-2 rounded-full bg-[#8B7355] animate-pulse" />
             🧶 Aprende el arte de las manos
           </div>
 
           {/* Título */}
-          <h1 className="text-[2.25rem] leading-[1.1] sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-[#3e2723] mb-5 sm:mb-6 animate-fade-in-up">
+          <h1 className="text-[2.25rem] leading-[1.1] sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-[#1A1A1A] mb-5 sm:mb-6 animate-fade-in-up">
             Crea piezas únicas con{' '}
-            <span className="text-[#b04b2b] italic">
+            <span className="text-[#8B7355] italic">
               tus propias manos
             </span>
           </h1>
 
           {/* Subtítulo */}
-          <p className="text-base sm:text-xl md:text-2xl text-[#5d4037] max-w-2xl lg:mx-0 mx-auto mb-8 sm:mb-10 leading-relaxed animate-fade-in-up delay-100">
+          <p className="text-base sm:text-xl md:text-2xl text-[#4A4A4A] max-w-2xl lg:mx-0 mx-auto mb-8 sm:mb-10 leading-relaxed animate-fade-in-up delay-100">
             Curso completo de cestería, textiles y objetos artesanales. Desde servilleteros cocidos hasta cestos de diseño. Transforma tu pasión en un emprendimiento.
           </p>
 
@@ -81,8 +81,8 @@ export default function HeroSection() {
             <div className="absolute inset-0 bg-gradient-to-t from-[#3e2723]/40 to-transparent" />
           </div>
           {/* Elemento decorativo floating */}
-          <div className="absolute -bottom-4 sm:-bottom-6 -left-2 sm:-left-6 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl border border-[#d7ccc8] animate-bounce delay-700">
-            <p className="text-[#b04b2b] font-bold text-xs sm:text-sm">✨ 100% Hecho a mano</p>
+          <div className="absolute -bottom-4 sm:-bottom-6 -left-2 sm:-left-6 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl border border-[#E5E0D8] animate-bounce delay-700">
+            <p className="text-[#8B7355] font-bold text-xs sm:text-sm">✨ 100% Hecho a mano</p>
           </div>
         </div>
       </div>

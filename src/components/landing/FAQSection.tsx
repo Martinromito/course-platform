@@ -39,10 +39,10 @@ export default function FAQSection() {
     <section id="faq" className="py-16 sm:py-24 bg-white">
       <div className="max-w-3xl mx-auto px-5 sm:px-6">
         <div className="text-center mb-10 sm:mb-16">
-          <span className="text-[#b04b2b] text-xs sm:text-sm font-bold uppercase tracking-widest">
+          <span className="text-[#8B7355] text-xs sm:text-sm font-bold uppercase tracking-widest">
             Preguntas frecuentes
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#3e2723] mt-3">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1A1A1A] mt-3">
             ¿Tienes dudas?
           </h2>
         </div>
@@ -51,21 +51,21 @@ export default function FAQSection() {
           {faqs.map((faq, idx) => (
             <div
               key={idx}
-              className="border border-[#d7ccc8] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#fdfaf5]"
+              className="border border-[#E5E0D8] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#FAF9F6]"
             >
               <button
                 onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
                 className="w-full flex items-center justify-between p-4 sm:p-6 text-left gap-3 sm:gap-4"
               >
-                <span className="text-[#3e2723] font-bold text-sm sm:text-base">{faq.q}</span>
-                <span className={`text-[#b04b2b] text-xl sm:text-2xl flex-shrink-0 transition-transform duration-300 ${openIdx === idx ? 'rotate-45' : ''}`}>
+                <span className="text-[#1A1A1A] font-bold text-sm sm:text-base">{faq.q}</span>
+                <span className={`text-[#8B7355] text-xl sm:text-2xl flex-shrink-0 transition-transform duration-300 ${openIdx === idx ? 'rotate-45' : ''}`}>
                   +
                 </span>
               </button>
 
               {openIdx === idx && (
-                <div className="border-t border-[#d7ccc8] px-4 sm:px-6 pb-4 sm:pb-6 pt-3 sm:pt-5">
-                  <p className="text-[#5d4037] leading-relaxed font-medium text-sm sm:text-base">{faq.a}</p>
+                <div className="border-t border-[#E5E0D8] px-4 sm:px-6 pb-4 sm:pb-6 pt-3 sm:pt-5">
+                  <p className="text-[#4A4A4A] leading-relaxed font-medium text-sm sm:text-base">{faq.a}</p>
                 </div>
               )}
             </div>
