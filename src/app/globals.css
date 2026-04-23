@@ -12,10 +12,16 @@
   --accent: #d7ccc8;     /* Lino/Beige claro */
 }
 
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  overflow-x: hidden;
 }
 
 @layer utilities {

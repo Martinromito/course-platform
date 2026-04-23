@@ -3,14 +3,14 @@
 export const MOCK_USERS = {
   student: {
     name: 'Estudiante',
-    email: 'estudiante@lamackenna.com',
+    email: 'estudiante',
     password: '12345678',
     role: 'student',
     isPaid: true,
   },
   admin: {
     name: 'Administrador',
-    email: 'administrador@lamackenna.com',
+    email: 'administrador',
     password: '12345678',
     role: 'admin',
     isPaid: true,

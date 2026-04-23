@@ -1,5 +1,5 @@
 // src/components/landing/CurriculumSection.tsx
-// Sección de contenido del curso con acordeón
+// Sección de contenido del curso con acordeón - Optimizada para mobile
 
 'use client';
 
@@ -62,43 +62,43 @@ export default function CurriculumSection() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <section id="contenido" className="py-24 bg-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-16">
-          <span className="text-[#b04b2b] text-sm font-bold uppercase tracking-widest">
+    <section id="contenido" className="py-16 sm:py-24 bg-white">
+      <div className="max-w-4xl mx-auto px-5 sm:px-6">
+        <div className="text-center mb-10 sm:mb-16">
+          <span className="text-[#b04b2b] text-xs sm:text-sm font-bold uppercase tracking-widest">
             Qué vas a aprender
           </span>
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-[#3e2723] mt-3 mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#3e2723] mt-3 mb-4">
             Proyectos del curso
           </h2>
-          <div className="flex items-center justify-center gap-6 mt-4 text-[#8d6e63] text-sm">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mt-4 text-[#8d6e63] text-xs sm:text-sm">
             <span>🧵 {modules.length} módulos</span>
             <span>🎥 Videos paso a paso</span>
             <span>📥 Moldes incluidos</span>
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {modules.map((mod, idx) => (
             <div
               key={idx}
-              className="border border-[#d7ccc8] rounded-3xl overflow-hidden bg-[#fdfaf5] hover:border-[#b04b2b]/30 transition-colors shadow-sm"
+              className="border border-[#d7ccc8] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#fdfaf5] hover:border-[#b04b2b]/30 transition-colors shadow-sm"
             >
               <button
                 onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
-                className="w-full flex items-center justify-between p-6 text-left"
+                className="w-full flex items-center justify-between p-4 sm:p-6 text-left"
               >
-                <div className="flex items-center gap-5">
-                  <div className="w-10 h-10 rounded-xl bg-[#b04b2b]/10 border border-[#b04b2b]/20 flex items-center justify-center text-[#b04b2b] font-bold text-lg">
+                <div className="flex items-center gap-3 sm:gap-5 min-w-0">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[#b04b2b]/10 border border-[#b04b2b]/20 flex items-center justify-center text-[#b04b2b] font-bold text-base sm:text-lg flex-shrink-0">
                     {idx + 1}
                   </div>
-                  <div>
-                    <h3 className="text-[#3e2723] font-bold text-lg">{mod.title}</h3>
-                    <span className="text-[#8d6e63] text-xs uppercase tracking-wider font-semibold">{mod.duration}</span>
+                  <div className="min-w-0">
+                    <h3 className="text-[#3e2723] font-bold text-sm sm:text-lg leading-snug truncate">{mod.title}</h3>
+                    <span className="text-[#8d6e63] text-[10px] sm:text-xs uppercase tracking-wider font-semibold">{mod.duration}</span>
                   </div>
                 </div>
                 <svg
-                  className={`w-6 h-6 text-[#bcaaa4] transition-transform duration-300 ${openIdx === idx ? 'rotate-180' : ''}`}
+                  className={`w-5 h-5 sm:w-6 sm:h-6 text-[#bcaaa4] transition-transform duration-300 flex-shrink-0 ml-2 ${openIdx === idx ? 'rotate-180' : ''}`}
                   fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -106,12 +106,12 @@ export default function CurriculumSection() {
               </button>
 
               {openIdx === idx && (
-                <div className="border-t border-[#d7ccc8] px-6 pb-6 pt-2">
-                  <ul className="space-y-3 mt-4">
+                <div className="border-t border-[#d7ccc8] px-4 sm:px-6 pb-4 sm:pb-6 pt-2">
+                  <ul className="space-y-2.5 sm:space-y-3 mt-3 sm:mt-4">
                     {mod.lessons.map((lesson, li) => (
-                      <li key={li} className="flex items-center gap-4 text-[#5d4037] text-sm">
-                        <div className="w-2 h-2 rounded-full bg-[#e9a68a]" />
-                        {lesson}
+                      <li key={li} className="flex items-start gap-3 sm:gap-4 text-[#5d4037] text-sm">
+                        <div className="w-2 h-2 rounded-full bg-[#e9a68a] mt-1.5 flex-shrink-0" />
+                        <span>{lesson}</span>
                       </li>
                     ))}
                   </ul>

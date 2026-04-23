@@ -33,6 +33,7 @@ export default function CoursePlayerPage() {
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
+  const [isSyllabusOpen, setIsSyllabusOpen] = useState(false); // New state for mobile syllabus
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -105,11 +106,11 @@ export default function CoursePlayerPage() {
   const renderVideo = () => {
     if (!currentLesson?.videoUrl) {
       return (
-        <div className="aspect-video bg-[#3e2723] flex items-center justify-center flex-col p-8 text-center rounded-[40px] border-8 border-white shadow-2xl">
-          <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-6 text-white text-4xl">🔒</div>
-          <h3 className="text-white font-black text-2xl mb-4">Contenido bloqueado</h3>
-          <p className="text-[#d7ccc8] max-w-sm">Debes inscribirte a la academia para acceder a este proyecto.</p>
-          <Button className="mt-8 px-10" onClick={() => router.push('/#precio')}>Inscribirme ahora</Button>
+        <div className="aspect-video bg-[#3e2723] flex items-center justify-center flex-col p-4 sm:p-8 text-center rounded-[24px] sm:rounded-[40px] border-4 sm:border-8 border-white shadow-2xl">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full flex items-center justify-center mb-4 sm:mb-6 text-white text-3xl sm:text-4xl">🔒</div>
+          <h3 className="text-white font-black text-xl sm:text-2xl mb-3 sm:mb-4">Contenido bloqueado</h3>
+          <p className="text-[#d7ccc8] max-w-sm text-sm sm:text-base">Debes inscribirte a la academia para acceder a este proyecto.</p>
+          <Button className="mt-6 sm:mt-8 px-6 sm:px-10" onClick={() => router.push('/#precio')}>Inscribirme ahora</Button>
         </div>
       );
     }
@@ -117,7 +118,7 @@ export default function CoursePlayerPage() {
     if (currentLesson.videoType === 'youtube') {
       const videoId = getYoutubeId(currentLesson.videoUrl);
       return (
-        <div className="aspect-video rounded-[40px] overflow-hidden border-8 border-white shadow-2xl bg-black">
+        <div className="aspect-video rounded-[24px] sm:rounded-[40px] overflow-hidden border-4 sm:border-8 border-white shadow-2xl bg-black">
           {videoId ? (
             <iframe
               width="100%"
@@ -136,31 +137,39 @@ export default function CoursePlayerPage() {
     }
 
     return (
-      <div className="aspect-video rounded-[40px] overflow-hidden border-8 border-white shadow-2xl bg-black">
+      <div className="aspect-video rounded-[24px] sm:rounded-[40px] overflow-hidden border-4 sm:border-8 border-white shadow-2xl bg-black">
         <video src={currentLesson.videoUrl} controls className="w-full h-full"></video>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-[#fdfaf5] flex flex-col h-screen">
+    <div className="min-h-screen bg-[#fdfaf5] flex flex-col lg:h-screen">
       <Navbar />
       
-      <div className="flex-1 pt-24 flex flex-col lg:flex-row overflow-hidden">
+      <div className="flex-1 pt-16 sm:pt-24 flex flex-col lg:flex-row lg:overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-full lg:w-96 bg-white border-r border-[#d7ccc8] flex-shrink-0 flex flex-col overflow-hidden">
-          <div className="p-8 border-b border-[#d7ccc8] bg-[#fdfaf5]">
-            <h2 className="text-[#3e2723] font-black text-xl">Contenido</h2>
-            <p className="text-[#b04b2b] text-[10px] font-bold uppercase tracking-widest mt-2">Tu camino de aprendizaje</p>
+        <aside className="w-full lg:w-96 bg-white lg:border-r border-t lg:border-t-0 border-[#d7ccc8] flex-shrink-0 flex flex-col lg:overflow-hidden">
+          <div className="p-6 sm:p-8 border-b border-[#d7ccc8] bg-[#fdfaf5] flex justify-between items-center lg:block cursor-pointer lg:cursor-default" onClick={() => setIsSyllabusOpen(!isSyllabusOpen)}>
+            <div>
+              <h2 className="text-[#3e2723] font-black text-lg sm:text-xl">Contenido</h2>
+              <p className="text-[#b04b2b] text-[10px] font-bold uppercase tracking-widest mt-1 sm:mt-2">Tu camino de aprendizaje</p>
+            </div>
+            <button className="lg:hidden text-[#b04b2b] flex items-center justify-center w-10 h-10 bg-[#b04b2b]/10 rounded-full">
+              <svg className={`w-6 h-6 transition-transform duration-300 ${isSyllabusOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar">
+          
+          <div className={`flex-1 lg:overflow-y-auto custom-scrollbar transition-all duration-300 ${isSyllabusOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0 lg:max-h-none lg:opacity-100'} overflow-hidden lg:overflow-y-auto`}>
             {modules.map((mod, mIdx) => (
               <div key={mod._id}>
-                <div className="px-6 py-4 bg-[#fdfaf5] border-b border-[#d7ccc8]/30 flex items-center gap-4">
-                  <span className="w-6 h-6 rounded-full bg-[#b04b2b] text-white flex items-center justify-center text-[10px] font-bold">
+                <div className="px-5 sm:px-6 py-3 sm:py-4 bg-[#fdfaf5] border-b border-[#d7ccc8]/30 flex items-center gap-3 sm:gap-4">
+                  <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#b04b2b] text-white flex items-center justify-center text-[9px] sm:text-[10px] font-bold flex-shrink-0">
                     {mIdx + 1}
                   </span>
-                  <span className="text-[#3e2723] font-black text-sm uppercase tracking-tight">{mod.title}</span>
+                  <span className="text-[#3e2723] font-black text-xs sm:text-sm uppercase tracking-tight">{mod.title}</span>
                 </div>
                 <div className="divide-y divide-[#d7ccc8]/30">
                   {mod.lessons.map((lesson) => (
@@ -168,7 +177,7 @@ export default function CoursePlayerPage() {
                       key={lesson._id}
                       disabled={!user?.isPaid && !lesson.isPreview}
                       onClick={() => router.push(`/dashboard/course/${mod._id}/${lesson._id}`)}
-                      className={`w-full flex items-center gap-5 p-6 text-left transition-all ${
+                      className={`w-full flex items-center gap-3 sm:gap-5 p-4 sm:p-6 text-left transition-all ${
                         lessonId === lesson._id
                           ? 'bg-[#b04b2b] text-white'
                           : !user?.isPaid && !lesson.isPreview
@@ -176,18 +185,18 @@ export default function CoursePlayerPage() {
                           : 'hover:bg-[#fdfaf5] text-[#5d4037]'
                       }`}
                     >
-                      <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                      <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors ${
                         lessonId === lesson._id ? 'bg-white/20' : 'bg-[#d7ccc8]/30'
                       }`}>
-                        <span className="text-xs">▶</span>
+                        <span className="text-[10px] sm:text-xs">▶</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-bold leading-tight ${lessonId === lesson._id ? 'text-white' : 'text-[#3e2723]'}`}>
+                        <p className={`text-xs sm:text-sm font-bold leading-tight ${lessonId === lesson._id ? 'text-white' : 'text-[#3e2723]'}`}>
                           {lesson.title}
                         </p>
                       </div>
                       {lesson.isPreview && !user?.isPaid && (
-                        <span className="text-[9px] font-black bg-green-100 text-green-700 px-3 py-1 rounded-full border border-green-200 uppercase tracking-tighter">Libre</span>
+                        <span className="text-[8px] sm:text-[9px] font-black bg-green-100 text-green-700 px-2 sm:px-3 py-1 rounded-full border border-green-200 uppercase tracking-tighter ml-2">Libre</span>
                       )}
                     </button>
                   ))}
@@ -198,8 +207,8 @@ export default function CoursePlayerPage() {
         </aside>
 
         {/* Player */}
-        <main className="flex-1 bg-[#fdfaf5] p-6 lg:p-12 overflow-y-auto">
-          <div className="max-w-5xl mx-auto pb-20">
+        <main className="flex-1 bg-[#fdfaf5] p-4 sm:p-6 lg:p-12 lg:overflow-y-auto">
+          <div className="max-w-5xl mx-auto pb-10 sm:pb-20">
             {renderVideo()}
 
             {currentLesson && (

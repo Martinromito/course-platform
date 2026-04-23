@@ -163,15 +163,15 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-[#fdfaf5]">
         <Navbar />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
+        <main className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-16 sm:pb-20">
           
           {/* HEADER DASHBOARD / EDITOR */}
-          <div className="mb-12 flex flex-col md:flex-row md:justify-between md:items-end gap-6">
+          <div className="mb-8 sm:mb-12 flex flex-col md:flex-row md:justify-between md:items-end gap-4 sm:gap-6">
             <div>
-              <h1 className="text-4xl font-black text-[#3e2723]">
+              <h1 className="text-2xl sm:text-4xl font-black text-[#3e2723]">
                 {editingModule ? 'Editando Módulo' : 'Panel de Control 🛠️'}
               </h1>
-              <p className="text-[#8d6e63] mt-3 font-medium text-lg">
+              <p className="text-[#8d6e63] mt-2 sm:mt-3 font-medium text-sm sm:text-lg">
                 {editingModule ? `Ajustando los detalles de "${editingModule.title}"` : `Bienvenida, ${user?.name}. Aquí puedes gestionar tu academia.`}
               </p>
             </div>
@@ -191,7 +191,7 @@ export default function DashboardPage() {
             /* VISTA DEL EDITOR */
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               {/* Información General del Módulo */}
-              <div className="bg-white border border-[#d7ccc8] rounded-[40px] p-10 shadow-sm">
+              <div className="bg-white border border-[#d7ccc8] rounded-[28px] sm:rounded-[40px] p-6 sm:p-10 shadow-sm">
                 <h2 className="text-2xl font-black text-[#3e2723] mb-8 flex items-center gap-3">
                   <span className="w-10 h-10 rounded-xl bg-[#fdfaf5] flex items-center justify-center text-xl">📁</span>
                   Información General
@@ -219,7 +219,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Listado de Lecciones */}
-              <div className="bg-white border border-[#d7ccc8] rounded-[40px] p-10 shadow-sm">
+              <div className="bg-white border border-[#d7ccc8] rounded-[28px] sm:rounded-[40px] p-6 sm:p-10 shadow-sm">
                 <div className="flex justify-between items-center mb-10">
                   <h2 className="text-2xl font-black text-[#3e2723] flex items-center gap-3">
                     <span className="w-10 h-10 rounded-xl bg-[#fdfaf5] flex items-center justify-center text-xl">🎬</span>
@@ -230,7 +230,7 @@ export default function DashboardPage() {
 
                 <div className="space-y-6">
                   {editingModule.lessons?.map((lesson: any, index: number) => (
-                    <div key={lesson._id} className="p-8 bg-[#fdfaf5] border border-[#d7ccc8] rounded-3xl relative group">
+                    <div key={lesson._id} className="p-5 sm:p-8 bg-[#fdfaf5] border border-[#d7ccc8] rounded-2xl sm:rounded-3xl relative group">
                       <div className="flex justify-between items-start mb-6">
                         <span className="bg-[#b04b2b] text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm">
                           {index + 1}
@@ -296,37 +296,37 @@ export default function DashboardPage() {
           ) : (
             /* VISTA DEL LISTADO (Anterior) */
             <>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div className="bg-white border border-[#d7ccc8] p-8 rounded-3xl shadow-sm">
-                  <span className="text-sm font-bold text-[#b04b2b] uppercase tracking-widest">Alumnos Totales</span>
-                  <div className="text-4xl font-black text-[#3e2723] mt-2">1,248</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
+                <div className="bg-white border border-[#d7ccc8] p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#b04b2b] uppercase tracking-widest">Alumnos Totales</span>
+                  <div className="text-3xl sm:text-4xl font-black text-[#3e2723] mt-2">1,248</div>
                 </div>
-                <div className="bg-white border border-[#d7ccc8] p-8 rounded-3xl shadow-sm">
-                  <span className="text-sm font-bold text-[#b04b2b] uppercase tracking-widest">Módulos</span>
-                  <div className="text-4xl font-black text-[#3e2723] mt-2">{modules.length}</div>
+                <div className="bg-white border border-[#d7ccc8] p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#b04b2b] uppercase tracking-widest">Módulos</span>
+                  <div className="text-3xl sm:text-4xl font-black text-[#3e2723] mt-2">{modules.length}</div>
                 </div>
-                <div className="bg-white border border-[#d7ccc8] p-8 rounded-3xl shadow-sm">
-                  <span className="text-sm font-bold text-[#b04b2b] uppercase tracking-widest">Ingresos Mes</span>
-                  <div className="text-4xl font-black text-[#3e2723] mt-2">$45,200</div>
+                <div className="bg-white border border-[#d7ccc8] p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-[#b04b2b] uppercase tracking-widest">Ingresos Mes</span>
+                  <div className="text-3xl sm:text-4xl font-black text-[#3e2723] mt-2">$45,200</div>
                 </div>
               </div>
 
-              <div className="bg-white border border-[#d7ccc8] rounded-[40px] overflow-hidden shadow-xl shadow-[#b04b2b]/5">
-                <div className="p-8 border-b border-[#d7ccc8] flex justify-between items-center bg-[#fdfaf5]">
-                  <h2 className="text-2xl font-black text-[#3e2723]">Gestión de Contenido</h2>
+              <div className="bg-white border border-[#d7ccc8] rounded-[28px] sm:rounded-[40px] overflow-hidden shadow-xl shadow-[#b04b2b]/5">
+                <div className="p-5 sm:p-8 border-b border-[#d7ccc8] flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center bg-[#fdfaf5]">
+                  <h2 className="text-xl sm:text-2xl font-black text-[#3e2723]">Gestión de Contenido</h2>
                   <Button size="sm" onClick={addModule}>+ Nuevo Módulo</Button>
                 </div>
                 
                 <div className="divide-y divide-[#d7ccc8]">
                   {modules.length > 0 ? (
                     modules.map((mod, idx) => (
-                      <div key={mod._id} className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-[#fdfaf5]/50 transition-colors">
-                        <div className="flex gap-6 items-center">
-                          <div className="w-14 h-14 bg-[#e9a68a]/20 rounded-2xl flex items-center justify-center text-[#b04b2b] font-black text-xl">
+                      <div key={mod._id} className="p-5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 hover:bg-[#fdfaf5]/50 transition-colors">
+                        <div className="flex gap-4 sm:gap-6 items-center">
+                          <div className="w-11 h-11 sm:w-14 sm:h-14 bg-[#e9a68a]/20 rounded-xl sm:rounded-2xl flex items-center justify-center text-[#b04b2b] font-black text-lg sm:text-xl flex-shrink-0">
                             {idx + 1}
                           </div>
                           <div>
-                            <h3 className="font-bold text-[#3e2723] text-xl">{mod.title}</h3>
+                            <h3 className="font-bold text-[#3e2723] text-base sm:text-xl">{mod.title}</h3>
                             <p className="text-[#8d6e63] text-sm mt-1">{mod.lessons?.length || 0} lecciones configuradas</p>
                           </div>
                         </div>
@@ -355,17 +355,17 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#fdfaf5]">
       <Navbar />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
-        <div className="mb-12">
-          <h1 className="text-4xl font-black text-[#3e2723]">¡Hola de nuevo, {user?.name}! 👋</h1>
-          <p className="text-[#8d6e63] mt-3 font-medium text-lg">Es un gran día para seguir creando algo hermoso.</p>
+      <main className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-16 sm:pb-20">
+        <div className="mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-4xl font-black text-[#3e2723]">¡Hola de nuevo, {user?.name}! 👋</h1>
+          <p className="text-[#8d6e63] mt-2 sm:mt-3 font-medium text-sm sm:text-lg">Es un gran día para seguir creando algo hermoso.</p>
         </div>
 
         {!user?.isPaid ? (
-          <div className="bg-white border border-[#d7ccc8] rounded-[40px] p-12 text-center shadow-xl shadow-[#b04b2b]/5">
-            <div className="w-20 h-20 bg-[#e9a68a]/20 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">🔒</div>
-            <h2 className="text-3xl font-black text-[#3e2723] mb-4">Acceso Limitado</h2>
-            <p className="text-[#5d4037] max-w-2xl mx-auto mb-10 text-lg leading-relaxed">
+          <div className="bg-white border border-[#d7ccc8] rounded-[28px] sm:rounded-[40px] p-8 sm:p-12 text-center shadow-xl shadow-[#b04b2b]/5">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#e9a68a]/20 rounded-full flex items-center justify-center mx-auto mb-5 sm:mb-6 text-2xl sm:text-3xl">🔒</div>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#3e2723] mb-3 sm:mb-4">Acceso Limitado</h2>
+            <p className="text-[#5d4037] max-w-2xl mx-auto mb-8 sm:mb-10 text-base sm:text-lg leading-relaxed">
               Tu cuenta está activa, pero aún no tienes acceso completo a la academia. 
               Inscríbete hoy para desbloquear todos los proyectos y empezar a aprender con nosotros.
             </p>
