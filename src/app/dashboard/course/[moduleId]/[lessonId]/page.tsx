@@ -129,10 +129,14 @@ export default function CoursePlayerPage() {
     if (currentLesson.videoType === 'youtube') {
       const videoId = getYoutubeId(currentLesson.videoUrl);
       return (
-        <div className="rounded-[24px] sm:rounded-[40px] overflow-hidden border-4 sm:border-8 border-white shadow-2xl bg-black">
+        <div className="rounded-[24px] sm:rounded-[40px] overflow-hidden border-4 sm:border-8 border-white shadow-2xl bg-black relative group">
           <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+          
+          {/* Capa invisible para bloquear clics en el título de YouTube */}
+          <div className="absolute top-0 left-0 w-full h-20 z-10 bg-transparent cursor-default pointer-events-auto" title="Contenido Protegido" />
+          
           <div 
-            className="plyr__video-embed" 
+            className="plyr__video-embed z-0" 
             id="player"
             style={{ 
               '--plyr-color-main': '#8B7355',
