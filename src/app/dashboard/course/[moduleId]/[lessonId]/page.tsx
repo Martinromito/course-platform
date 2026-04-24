@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/landing/Navbar';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
+import Script from 'next/script';
 
 interface Lesson {
   _id: string;
@@ -35,6 +36,7 @@ export default function CoursePlayerPage() {
   const [completed, setCompleted] = useState(false);
   const [isSyllabusOpen, setIsSyllabusOpen] = useState(false); // New state for mobile syllabus
   const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({});
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const toggleModule = (id: string) => {
     setExpandedModules(prev => ({
@@ -115,10 +117,10 @@ export default function CoursePlayerPage() {
   const renderVideo = () => {
     if (!currentLesson?.videoUrl) {
       return (
-        <div className="aspect-video bg-[#3e2723] flex items-center justify-center flex-col p-4 sm:p-8 text-center rounded-[24px] sm:rounded-[40px] border-4 sm:border-8 border-white shadow-2xl">
+        <div className="aspect-video bg-[#1A1A1A] flex items-center justify-center flex-col p-4 sm:p-8 text-center rounded-[24px] sm:rounded-[40px] border-4 sm:border-8 border-white shadow-2xl">
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/10 rounded-full flex items-center justify-center mb-4 sm:mb-6 text-white text-3xl sm:text-4xl">🔒</div>
           <h3 className="text-white font-black text-xl sm:text-2xl mb-3 sm:mb-4">Contenido bloqueado</h3>
-          <p className="text-[#d7ccc8] max-w-sm text-sm sm:text-base">Debes inscribirte a la academia para acceder a este proyecto.</p>
+          <p className="text-[#E5E0D8] max-w-sm text-sm sm:text-base">Debes inscribirte a la academia para acceder a este proyecto.</p>
           <Button className="mt-6 sm:mt-8 px-6 sm:px-10" onClick={() => router.push('/#precio')}>Inscribirme ahora</Button>
         </div>
       );
@@ -127,20 +129,31 @@ export default function CoursePlayerPage() {
     if (currentLesson.videoType === 'youtube') {
       const videoId = getYoutubeId(currentLesson.videoUrl);
       return (
-        <div className="aspect-video rounded-[24px] sm:rounded-[40px] overflow-hidden border-4 sm:border-8 border-white shadow-2xl bg-black">
-          {videoId ? (
+        <div className="rounded-[24px] sm:rounded-[40px] overflow-hidden border-4 sm:border-8 border-white shadow-2xl bg-black">
+          <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+          <div 
+            className="plyr__video-embed" 
+            id="player"
+            style={{ 
+              '--plyr-color-main': '#8B7355',
+            } as React.CSSProperties}
+          >
             <iframe
-              width="100%"
-              height="100%"
-              src={`https://www.youtube.com/embed/${videoId}?rel=0&showinfo=0&modestbranding=1`}
-              title={currentLesson.title}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              src={`https://www.youtube.com/embed/${videoId}?origin=${typeof window !== 'undefined' ? window.location.origin : ''}&iv_load_policy=3&modestbranding=1&playsinline=1&showinfo=0&rel=0&enablejsapi=1`}
               allowFullScreen
+              allow="autoplay"
             ></iframe>
-          ) : (
-            <div className="flex items-center justify-center h-full text-white">URL de video no válida</div>
-          )}
+          </div>
+          <Script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js" strategy="afterInteractive" onLoad={() => {
+            // @ts-ignore
+            if (typeof Plyr !== 'undefined') {
+              // @ts-ignore
+              new Plyr('#player', {
+                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                tooltips: { controls: true, seek: true },
+              });
+            }
+          }} />
         </div>
       );
     }
