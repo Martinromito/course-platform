@@ -1,8 +1,8 @@
 // src/app/layout.tsx
-// Layout raíz con providers globales
+// Layout raíz con providers globales — Rediseño ecommerce + cursos
 
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
@@ -13,14 +13,21 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-playfair',
+  weight: ['400', '500', '600', '700', '800'],
+});
+
 export const metadata: Metadata = {
-  title: 'La Mackenna — Curso de Objetos Artesanales',
+  title: 'La Mackenna — Productos Artesanales y Cursos Creativos',
   description:
-    'Aprende a crear cestos, textiles y objetos únicos para el hogar. Transforma tu pasión en un emprendimiento con nuestro curso completo.',
-  keywords: 'cestería, objetos artesanales, curso costura, servilleteros cocidos, emprendimiento artesanal',
+    'Descubrí productos artesanales, insumos exclusivos y capacitaciones para aprender nuevas técnicas. Pinturas fluidas, kits, herramientas y más.',
+  keywords: 'productos artesanales, pinturas fluidas, cursos creativos, kits artesanales, herramientas, La Mackenna',
   openGraph: {
-    title: 'La Mackenna — Academia de Artesanías',
-    description: 'Aprende el arte de crear con tus manos con La Mackenna.',
+    title: 'La Mackenna — Productos Artesanales y Cursos Creativos',
+    description: 'Tu tienda de productos artesanales y academia de técnicas creativas.',
     type: 'website',
   },
 };
@@ -31,20 +38,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={inter.variable} suppressHydrationWarning>
-      <body className="bg-[#fdfaf5] text-[#3e2723] antialiased">
+    <html lang="es" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
+      <body className="bg-[#FAF8F4] text-[#1A1A1A] antialiased">
         <AuthProvider>
           {children}
           <Toaster
             position="top-right"
             toastOptions={{
               style: {
-                background: '#fff',
-                color: '#3e2723',
-                border: '1px solid #d7ccc8',
-                borderRadius: '16px',
+                background: '#FFFDF9',
+                color: '#1A1A1A',
+                border: '1px solid #E8E2D9',
+                borderRadius: '12px',
                 fontSize: '14px',
-                fontWeight: '600',
+                fontWeight: '500',
               },
             }}
           />

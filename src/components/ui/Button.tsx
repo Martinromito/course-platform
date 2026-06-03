@@ -1,5 +1,5 @@
 // src/components/ui/Button.tsx
-// Componente de botón reutilizable con variantes
+// Componente de botón reutilizable con variantes — Paleta artesanal
 
 import React from 'react';
 
@@ -12,11 +12,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<string, string> = {
   primary:
-    'bg-gradient-to-r from-[#8B7355] to-[#705E45] hover:from-[#A68B67] hover:to-[#8B7355] text-white shadow-lg shadow-[#8B7355]/20 hover:shadow-[#8B7355]/30',
+    'bg-[#8B7355] hover:bg-[#705E45] text-white shadow-sm hover:shadow-md',
   secondary:
     'bg-[#1A1A1A] hover:bg-[#333333] text-white',
   outline:
-    'border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355]/5',
+    'border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white',
   ghost:
     'text-[#4A4A4A] hover:bg-[#F2F0ED] hover:text-[#1A1A1A]',
   danger:
@@ -24,10 +24,10 @@ const variants: Record<string, string> = {
 };
 
 const sizes: Record<string, string> = {
-  sm: 'px-3 py-1.5 text-sm',
+  sm: 'px-4 py-2 text-sm',
   md: 'px-5 py-2.5 text-sm',
   lg: 'px-6 py-3 text-base',
-  xl: 'px-8 py-4 text-lg',
+  xl: 'px-8 py-3.5 text-base',
 };
 
 export default function Button({
@@ -44,9 +44,9 @@ export default function Button({
       {...props}
       disabled={disabled || loading}
       className={`
-        inline-flex items-center justify-center gap-2 rounded-xl font-semibold
-        transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-slate-900
-        disabled:opacity-50 disabled:cursor-not-allowed
+        inline-flex items-center justify-center gap-2 rounded-lg font-medium
+        transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#8B7355]/40 focus:ring-offset-2 focus:ring-offset-[#FAF8F4]
+        disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer
         ${variants[variant]}
         ${sizes[size]}
         ${className}
