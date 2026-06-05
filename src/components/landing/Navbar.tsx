@@ -5,6 +5,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 import { useState, useEffect } from 'react';
 import { Search, ShoppingBag, User, Menu, X, ChevronDown } from 'lucide-react';
 
@@ -18,6 +19,7 @@ const navLinks = [
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { totalItems, openCart } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -113,6 +115,12 @@ export default function Navbar() {
                   >
                     Mi cuenta
                   </Link>
+                  <Link
+                    href="/mis-pedidos"
+                    className="px-3 py-2 text-[13px] font-medium text-[#4A4A4A] hover:text-[#8B7355] hover:bg-[#8B7355]/5 rounded-lg transition-all"
+                  >
+                    Mis pedidos
+                  </Link>
                   <button
                     onClick={logout}
                     className="px-3 py-2 text-[13px] font-medium text-[#7A6E60] hover:text-[#8B7355] hover:bg-[#8B7355]/5 rounded-lg transition-all"
@@ -133,27 +141,33 @@ export default function Navbar() {
 
               {/* Cart */}
               <button
+                onClick={openCart}
                 className="p-2.5 rounded-lg text-[#4A4A4A] hover:text-[#8B7355] hover:bg-[#8B7355]/5 transition-all relative"
                 aria-label="Carrito"
                 id="btn-cart"
               >
                 <ShoppingBag className="w-[18px] h-[18px]" />
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#8B7355] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                  0
-                </span>
+                {totalItems > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#8B7355] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
               </button>
             </div>
 
             {/* Mobile Actions */}
             <div className="flex lg:hidden items-center gap-1">
               <button
+                onClick={openCart}
                 className="p-2.5 rounded-lg text-[#4A4A4A] hover:text-[#8B7355] transition-all relative"
                 aria-label="Carrito"
               >
                 <ShoppingBag className="w-5 h-5" />
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#8B7355] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                  0
-                </span>
+                {totalItems > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#8B7355] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
               </button>
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -266,6 +280,13 @@ export default function Navbar() {
                     className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-[#8B7355] text-white font-medium text-sm hover:bg-[#705E45] transition-colors"
                   >
                     Mi cuenta
+                  </Link>
+                  <Link
+                    href="/mis-pedidos"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-[#E8E2D9] text-[#4A4A4A] font-medium text-sm hover:bg-[#F2F0ED] transition-colors"
+                  >
+                    Mis pedidos
                   </Link>
                   <button
                     onClick={() => { logout(); setMenuOpen(false); }}

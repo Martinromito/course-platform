@@ -1,21 +1,23 @@
 // src/app/login/page.tsx
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import toast from 'react-hot-toast';
 
-export default function LoginPage() {
+function LoginContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/dashboard';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +26,7 @@ export default function LoginPage() {
     try {
       await login(email, password);
       toast.success('¡Bienvenido de nuevo!');
-      router.push('/dashboard');
+      router.push(redirectUrl);
     } catch (err: any) {
       toast.error(err.message || 'Error al iniciar sesión');
     } finally {
@@ -83,5 +85,13 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-[#8B7355]"></div></div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

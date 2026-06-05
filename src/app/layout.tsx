@@ -5,6 +5,8 @@ import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { CartProvider } from '@/contexts/CartContext';
+import CartDrawer from '@/components/cart/CartDrawer';
 import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({
@@ -41,20 +43,23 @@ export default function RootLayout({
     <html lang="es" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body className="bg-[#FAF8F4] text-[#1A1A1A] antialiased">
         <AuthProvider>
-          {children}
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              style: {
-                background: '#FFFDF9',
-                color: '#1A1A1A',
-                border: '1px solid #E8E2D9',
-                borderRadius: '12px',
-                fontSize: '14px',
-                fontWeight: '500',
-              },
-            }}
-          />
+          <CartProvider>
+            {children}
+            <CartDrawer />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                style: {
+                  background: '#FFFDF9',
+                  color: '#1A1A1A',
+                  border: '1px solid #E8E2D9',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                },
+              }}
+            />
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

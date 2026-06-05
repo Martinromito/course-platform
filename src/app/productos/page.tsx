@@ -4,75 +4,23 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import Button from '@/components/ui/Button';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, ShoppingBag } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
+import toast from 'react-hot-toast';
 
-const products = [
-  {
-    id: 1,
-    name: 'Kit Paleta Completa',
-    price: '$69.000',
-    discountPrice: '$60.030',
-    image: '/images/product-kit.png',
-    badge: 'Más vendido',
-    category: 'kits',
-  },
-  {
-    id: 2,
-    name: 'Set de Pinceles Premium',
-    price: '$24.500',
-    image: '/images/product-pinceles.png',
-    category: 'herramientas',
-  },
-  {
-    id: 3,
-    name: 'Paleta Celestes y Neutros',
-    price: '$27.587',
-    discountPrice: '$24.000',
-    image: '/images/product-paleta.png',
-    badge: 'Nuevo',
-    category: 'pinturas-fluidas',
-  },
-  {
-    id: 4,
-    name: 'Pieza Decorativa Marmolada',
-    price: '$18.900',
-    image: '/images/product-pieza.png',
-    category: 'accesorios',
-  },
-  {
-    id: 5,
-    name: 'Kit de Inicio Pouring',
-    price: '$45.000',
-    discountPrice: '$39.900',
-    image: '/images/product-kit.png',
-    category: 'kits',
-  },
-  {
-    id: 6,
-    name: 'Acrílico Metalizado Oro 250ml',
-    price: '$11.200',
-    image: '/images/cat-pinturas.png',
-    category: 'pinturas-fluidas',
-  },
-  {
-    id: 7,
-    name: 'Stickers de Vinilo Creativos',
-    price: '$5.500',
-    image: '/images/product-pieza.png',
-    category: 'stickers',
-  },
-  {
-    id: 8,
-    name: 'Soporte MDF Circular 30cm',
-    price: '$12.800',
-    image: '/images/product-pieza.png',
-    category: 'accesorios',
-  },
-];
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  originalPrice: number | null;
+  image: string;
+  badge: string | null;
+  category: string;
+}
 
 const categories = [
   { id: 'todos', name: 'Todos' },
@@ -83,9 +31,28 @@ const categories = [
   { id: 'stickers', name: 'Stickers' },
 ];
 
+function formatPrice(price: number): string {
+  return `$${price.toLocaleString('es-AR')}`;
+}
+
 function ProductsContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { addItem, openCart } = useCart();
+  
   const [selectedCat, setSelectedCat] = useState('todos');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => {
+        if (data.products) setProducts(data.products);
+      })
+      .catch(() => toast.error('Error al cargar productos'))
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     const cat = searchParams.get('cat');
@@ -99,6 +66,27 @@ function ProductsContent() {
   const filteredProducts = selectedCat === 'todos'
     ? products
     : products.filter(p => p.category === selectedCat);
+
+  const handleAddToCart = (product: Product, e: React.MouseEvent) => {
+    e.stopPropagation();
+    addItem(product, 1);
+    toast.success('Producto agregado al carrito');
+    openCart();
+  };
+
+  const handleBuyNow = (product: Product, e: React.MouseEvent) => {
+    e.stopPropagation();
+    addItem(product, 1);
+    router.push('/checkout');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FAF8F4] flex items-center justify-center pt-28">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#8B7355]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FAF8F4] pt-28 pb-16">
@@ -162,6 +150,16 @@ function ProductsContent() {
                       {product.badge}
                     </span>
                   )}
+                  {/* Quick action on hover (solo desktop) */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 hidden lg:flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100">
+                    <button 
+                      onClick={(e) => handleAddToCart(product, e)}
+                      className="bg-white/95 backdrop-blur-sm text-[#1A1A1A] px-4 py-2.5 rounded-lg text-xs font-semibold shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-2 hover:bg-[#8B7355] hover:text-white"
+                    >
+                      <ShoppingBag className="w-3.5 h-3.5" />
+                      Agregar al carrito
+                    </button>
+                  </div>
                 </div>
 
                 {/* Info */}
@@ -171,25 +169,30 @@ function ProductsContent() {
                       {product.name}
                     </h3>
                     <div className="flex items-center gap-2 mb-4">
-                      {product.discountPrice ? (
+                      {product.originalPrice ? (
                         <>
                           <span className="text-[#8B7355] font-bold text-sm sm:text-base">
-                            {product.discountPrice}
+                            {formatPrice(product.price)}
                           </span>
                           <span className="text-[#7A6E60] line-through text-xs sm:text-sm">
-                            {product.price}
+                            {formatPrice(product.originalPrice)}
                           </span>
                         </>
                       ) : (
                         <span className="text-[#1A1A1A] font-bold text-sm sm:text-base">
-                          {product.price}
+                          {formatPrice(product.price)}
                         </span>
                       )}
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Comprar
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="flex-1 px-0" onClick={(e) => handleAddToCart(product, e)}>
+                      <ShoppingBag className="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" className="flex-[3]" onClick={(e) => handleBuyNow(product, e)}>
+                      Comprar ahora
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}

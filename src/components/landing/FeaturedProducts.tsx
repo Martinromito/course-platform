@@ -3,41 +3,50 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
+import { useCart } from '@/contexts/CartContext';
+import { ShoppingBag } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-const products = [
-  {
-    id: 1,
-    name: 'Kit Paleta Completa',
-    price: '$69.000',
-    discountPrice: '$60.030',
-    image: '/images/product-kit.png',
-    badge: 'Más vendido',
-  },
-  {
-    id: 2,
-    name: 'Set de Pinceles Premium',
-    price: '$24.500',
-    image: '/images/product-pinceles.png',
-  },
-  {
-    id: 3,
-    name: 'Paleta Celestes y Neutros',
-    price: '$27.587',
-    discountPrice: '$24.000',
-    image: '/images/product-paleta.png',
-    badge: 'Nuevo',
-  },
-  {
-    id: 4,
-    name: 'Pieza Decorativa Marmolada',
-    price: '$18.900',
-    image: '/images/product-pieza.png',
-  },
-];
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  originalPrice: number | null;
+  image: string;
+  badge: string | null;
+  category: string;
+}
+
+function formatPrice(price: number): string {
+  return `$${price.toLocaleString('es-AR')}`;
+}
 
 export default function FeaturedProducts() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const { addItem, openCart } = useCart();
+
+  useEffect(() => {
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => {
+        if (data.products) {
+          // Mostrar solo los primeros 4 para destacados
+          setProducts(data.products.slice(0, 4));
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleAddToCart = (product: Product, e: React.MouseEvent) => {
+    e.preventDefault(); // Por si el click se propaga
+    addItem(product, 1);
+    toast.success('Producto agregado al carrito');
+    openCart();
+  };
+
   return (
     <section id="productos" className="section-padding bg-white">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -63,9 +72,10 @@ export default function FeaturedProducts() {
         {/* Products Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {products.map((product) => (
-            <div
+            <Link
+              href={`/productos`} // En el futuro puede ir al detalle: `/productos/${product.id}`
               key={product.id}
-              className="product-card group bg-white rounded-xl sm:rounded-2xl border border-[#E8E2D9]/80 overflow-hidden cursor-pointer"
+              className="product-card group bg-white rounded-xl sm:rounded-2xl border border-[#E8E2D9]/80 overflow-hidden cursor-pointer block"
             >
               {/* Image */}
               <div className="relative aspect-square overflow-hidden bg-[#F5F0E8]">
@@ -81,8 +91,12 @@ export default function FeaturedProducts() {
                 )}
                 {/* Quick action on hover */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100">
-                  <button className="bg-white/95 backdrop-blur-sm text-[#1A1A1A] px-4 py-2 rounded-lg text-xs font-semibold shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                    Vista rápida
+                  <button 
+                    onClick={(e) => handleAddToCart(product, e)}
+                    className="bg-white/95 backdrop-blur-sm text-[#1A1A1A] px-4 py-2.5 rounded-lg text-xs font-semibold shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-2 hover:bg-[#8B7355] hover:text-white"
+                  >
+                    <ShoppingBag className="w-3.5 h-3.5" />
+                    Agregar al carrito
                   </button>
                 </div>
               </div>
@@ -93,23 +107,23 @@ export default function FeaturedProducts() {
                   {product.name}
                 </h3>
                 <div className="flex items-center gap-2">
-                  {product.discountPrice ? (
+                  {product.originalPrice ? (
                     <>
                       <span className="text-[#8B7355] font-bold text-sm sm:text-base">
-                        {product.discountPrice}
+                        {formatPrice(product.price)}
                       </span>
                       <span className="text-[#7A6E60] line-through text-xs sm:text-sm">
-                        {product.price}
+                        {formatPrice(product.originalPrice)}
                       </span>
                     </>
                   ) : (
                     <span className="text-[#1A1A1A] font-bold text-sm sm:text-base">
-                      {product.price}
+                      {formatPrice(product.price)}
                     </span>
                   )}
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 

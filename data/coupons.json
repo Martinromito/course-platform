@@ -1,0 +1,24 @@
+[
+  {
+    "id": "cup-1",
+    "code": "BIENVENIDA10",
+    "type": "percentage",
+    "value": 10,
+    "minPurchase": 20000,
+    "maxUses": 100,
+    "usedCount": 0,
+    "isActive": true,
+    "expiresAt": null
+  },
+  {
+    "id": "cup-2",
+    "code": "ENVIOGRATIS",
+    "type": "fixed",
+    "value": 5000,
+    "minPurchase": 15000,
+    "maxUses": 50,
+    "usedCount": 0,
+    "isActive": true,
+    "expiresAt": null
+  }
+]
