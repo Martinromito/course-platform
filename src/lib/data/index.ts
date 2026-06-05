@@ -1,5 +1,5 @@
 // src/lib/data/index.ts
-// Helpers para leer/escribir los archivos JSON de productos y cupones
+// Helpers para leer/escribir los archivos JSON de productos, cupones, usuarios y pedidos
 // Actúa como mini-DB local sin dependencias externas
 
 import { promises as fs } from 'fs';
@@ -31,11 +31,58 @@ export interface Coupon {
   expiresAt: string | null;
 }
 
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  password?: string;
+  role: 'student' | 'admin';
+  isPaid: boolean;
+  completedLessons: string[];
+  createdAt: string;
+}
+
+export interface OrderItem {
+  productId: string;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  image: string;
+}
+
+export interface ShippingAddress {
+  name: string;
+  address: string;
+  city: string;
+  province: string;
+  zip: string;
+  phone: string;
+}
+
+export interface Order {
+  _id: string;
+  userId: string;
+  items: OrderItem[];
+  subtotal: number;
+  couponCode?: string;
+  couponDiscount: number;
+  shippingCost: number;
+  total: number;
+  status: 'pending' | 'approved' | 'rejected' | 'refunded';
+  mpPaymentId?: string;
+  mpPreferenceId?: string;
+  shippingAddress?: ShippingAddress;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ─── File Paths ──────────────────────────────────────────────────────────────
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
 const COUPONS_FILE = path.join(DATA_DIR, 'coupons.json');
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
+const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 
 // ─── Generic read/write ──────────────────────────────────────────────────────
 
@@ -120,6 +167,36 @@ export async function validateCoupon(
   }
 
   return { valid: true, discount, coupon };
+}
+
+// ─── Users ───────────────────────────────────────────────────────────────────
+
+export async function getUsers(): Promise<User[]> {
+  return readJSON<User>(USERS_FILE);
+}
+
+export async function saveUsers(users: User[]): Promise<void> {
+  return writeJSON(USERS_FILE, users);
+}
+
+export async function getUserByEmail(email: string): Promise<User | undefined> {
+  const users = await getUsers();
+  return users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+}
+
+export async function getUserById(id: string): Promise<User | undefined> {
+  const users = await getUsers();
+  return users.find((u) => u._id === id);
+}
+
+// ─── Orders ──────────────────────────────────────────────────────────────────
+
+export async function getOrders(): Promise<Order[]> {
+  return readJSON<Order>(ORDERS_FILE);
+}
+
+export async function saveOrders(orders: Order[]): Promise<void> {
+  return writeJSON(ORDERS_FILE, orders);
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

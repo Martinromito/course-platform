@@ -5,9 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { withAuth } from '@/lib/auth/middleware';
 import { JWTPayload } from '@/lib/auth/jwt';
-import { connectDB } from '@/lib/db/mongodb';
-import Order from '@/lib/models/Order';
-import { getProducts, validateCoupon, calculateShipping } from '@/lib/data';
+import { getProducts, validateCoupon, calculateShipping, getOrders, saveOrders, type Order } from '@/lib/data';
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN!,
@@ -97,9 +95,12 @@ export const POST = withAuth(async (req: NextRequest, user: JWTPayload) => {
       });
     }
 
-    // 4. Crear Order en estado pending
-    await connectDB();
-    const order = await Order.create({
+    // 4. Crear Order en JSON
+    const orders = await getOrders();
+    const newOrderId = `ord-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+    const newOrder: Order = {
+      _id: newOrderId,
       userId: user.userId,
       items: orderItems,
       subtotal,
@@ -109,7 +110,13 @@ export const POST = withAuth(async (req: NextRequest, user: JWTPayload) => {
       total,
       status: 'pending',
       shippingAddress,
-    });
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    orders.push(newOrder);
+    // Lo guardamos provisoriamente, luego lo actualizamos con la preferencia
+    await saveOrders(orders);
 
     // 5. Crear Preferencia en Mercado Pago
     const preference = new Preference(client);
@@ -123,22 +130,26 @@ export const POST = withAuth(async (req: NextRequest, user: JWTPayload) => {
       },
       auto_return: 'approved' as const,
       notification_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/payments/webhook`,
-      external_reference: order._id.toString(), // Crucial: vincula MP con nuestra Order
+      external_reference: newOrder._id, // Crucial: vincula MP con nuestra Order
       statement_descriptor: 'LA MACKENNA',
       expires: false,
     };
 
     const result = await preference.create({ body: mpBody });
 
-    // Actualizar Order con preference ID
-    order.mpPreferenceId = result.id;
-    await order.save();
+    // Actualizar Order con preference ID en el JSON
+    const updatedOrders = await getOrders(); // volvemos a leer por seguridad
+    const index = updatedOrders.findIndex(o => o._id === newOrderId);
+    if (index !== -1) {
+      updatedOrders[index].mpPreferenceId = result.id;
+      await saveOrders(updatedOrders);
+    }
 
     return NextResponse.json({
       preferenceId: result.id,
       initPoint: result.init_point,
       sandboxInitPoint: result.sandbox_init_point,
-      orderId: order._id,
+      orderId: newOrderId,
     });
   } catch (error) {
     console.error('[CREATE PREFERENCE ERROR]', error);

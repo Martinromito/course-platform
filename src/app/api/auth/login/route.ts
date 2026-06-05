@@ -1,11 +1,11 @@
 // src/app/api/auth/login/route.ts
-// Endpoint de inicio de sesión
+// Endpoint de inicio de sesión — 100% JSON
 
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db/mongodb';
-import User from '@/lib/models/User';
+import { getUserByEmail } from '@/lib/data';
 import { signToken } from '@/lib/auth/jwt';
 import { MOCK_USERS } from '@/lib/constants/users';
+import bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,54 +18,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // --- MOCK USERS CHECK (Fallback para desarrollo) ---
+    // Buscar el usuario en nuestro JSON
+    const user = await getUserByEmail(email);
+    let isMatch = false;
+
+    // Si no está en el JSON, verificamos si es uno de los MOCK_USERS (para legacy/pruebas)
     const isMockStudent = email === MOCK_USERS.student.email && password === MOCK_USERS.student.password;
     const isMockAdmin = email === MOCK_USERS.admin.email && password === MOCK_USERS.admin.password;
 
-    if (isMockStudent || isMockAdmin) {
+    let finalUser: any = null;
+
+    if (user && user.password) {
+      // Comparar contraseña real
+      isMatch = await bcrypt.compare(password, user.password);
+      if (isMatch) finalUser = user;
+    } else if (isMockStudent || isMockAdmin) {
+      // Usar mock
+      isMatch = true;
       const mockUser = isMockStudent ? MOCK_USERS.student : MOCK_USERS.admin;
-      const token = signToken({
-        userId: isMockStudent ? 'mock-student-id' : 'mock-admin-id',
+      finalUser = {
+        _id: isMockStudent ? 'mock-student-id' : 'mock-admin-id',
+        name: mockUser.name,
         email: mockUser.email,
-        role: mockUser.role as 'student' | 'admin',
+        role: mockUser.role,
         isPaid: mockUser.isPaid,
-      });
-
-      const response = NextResponse.json({
-        message: 'Sesión iniciada (MOCK MODE).',
-        user: {
-          id: isMockStudent ? 'mock-student-id' : 'mock-admin-id',
-          name: mockUser.name,
-          email: mockUser.email,
-          role: mockUser.role,
-          isPaid: mockUser.isPaid,
-        },
-      });
-
-      response.cookies.set('auth_token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7,
-        path: '/',
-      });
-
-      return response;
-    }
-    // --- END MOCK USERS CHECK ---
-
-    await connectDB();
-    // Buscar usuario e incluir el campo password
-    const user = await User.findOne({ email }).select('+password');
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Credenciales incorrectas.' },
-        { status: 401 }
-      );
+      };
     }
 
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
+    if (!isMatch || !finalUser) {
       return NextResponse.json(
         { error: 'Credenciales incorrectas.' },
         { status: 401 }
@@ -73,20 +53,20 @@ export async function POST(req: NextRequest) {
     }
 
     const token = signToken({
-      userId: user._id.toString(),
-      email: user.email,
-      role: user.role,
-      isPaid: user.isPaid,
+      userId: finalUser._id,
+      email: finalUser.email,
+      role: finalUser.role,
+      isPaid: finalUser.isPaid,
     });
 
     const response = NextResponse.json({
       message: 'Sesión iniciada correctamente.',
       user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        isPaid: user.isPaid,
+        id: finalUser._id,
+        name: finalUser.name,
+        email: finalUser.email,
+        role: finalUser.role,
+        isPaid: finalUser.isPaid,
       },
     });
 

@@ -29,6 +29,10 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({});
 
+  const totalLessons = modules.reduce((acc, mod) => acc + (mod.lessons?.length || 0), 0);
+  const completedCount = user?.completedLessons?.length || 0;
+  const progressPercent = totalLessons === 0 ? 0 : Math.round((completedCount / totalLessons) * 100);
+
   const toggleModule = (id: string) => {
     setExpandedModules(prev => ({
       ...prev,
@@ -455,9 +459,12 @@ export default function DashboardPage() {
               <div className="bg-white border border-[#E5E0D8] rounded-3xl p-8 shadow-sm">
                 <h2 className="text-xl font-black text-[#1A1A1A] mb-6">Tu progreso</h2>
                 <div className="w-full bg-[#FAF9F6] rounded-full h-3 mb-3 border border-[#E5E0D8]/30">
-                  <div className="bg-[#8B7355] h-full rounded-full w-[10%] shadow-lg shadow-[#b04b2b]/20"></div>
+                  <div 
+                    className="bg-[#8B7355] h-full rounded-full shadow-lg shadow-[#b04b2b]/20 transition-all duration-1000 ease-out" 
+                    style={{ width: `${progressPercent}%` }}
+                  ></div>
                 </div>
-                <p className="text-sm font-bold text-[#705E45]">10% completado</p>
+                <p className="text-sm font-bold text-[#705E45]">{progressPercent}% completado</p>
                 
                 <div className="mt-8 pt-8 border-t border-[#E5E0D8]">
                   <h3 className="text-sm font-black text-[#1A1A1A] uppercase tracking-widest mb-4">Ayuda Personalizada</h3>

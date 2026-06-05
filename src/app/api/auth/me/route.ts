@@ -1,50 +1,48 @@
 // src/app/api/auth/me/route.ts
-// Retorna el usuario autenticado actual
+// Obtiene la sesión actual del usuario usando el token JWT y la base JSON
 
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db/mongodb';
-import User from '@/lib/models/User';
 import { verifyToken } from '@/lib/auth/jwt';
+import { getUserById } from '@/lib/data';
+import { MOCK_USERS } from '@/lib/constants/users';
 
 export async function GET(req: NextRequest) {
   try {
     const token = req.cookies.get('auth_token')?.value;
+
     if (!token) {
-      return NextResponse.json({ error: 'No autenticado.' }, { status: 401 });
+      return NextResponse.json({ user: null }, { status: 200 });
     }
 
+    // Verificar y decodificar el token
     const payload = verifyToken(token);
-    
-    // --- MOCK USERS CHECK ---
-    const { MOCK_USERS } = require('@/lib/constants/users');
-    if (payload.userId === 'mock-student-id' || payload.userId === 'mock-admin-id') {
-      const isStudent = payload.userId === 'mock-student-id';
-      const mockUser = isStudent ? MOCK_USERS.student : MOCK_USERS.admin;
-      return NextResponse.json({ 
-        user: {
-          id: payload.userId,
-          name: mockUser.name,
-          email: mockUser.email,
-          role: mockUser.role,
-          isPaid: mockUser.isPaid
-        } 
-      });
-    }
-    // --- END MOCK USERS CHECK ---
+    let userData = null;
 
-    try {
-      await connectDB();
-      const user = await User.findById(payload.userId).select('-password');
-      if (!user) {
-        return NextResponse.json({ error: 'Usuario no encontrado.' }, { status: 404 });
+    // Buscar el usuario en la "base de datos" (JSON)
+    const user = await getUserById(payload.userId);
+    if (user) {
+      userData = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        isPaid: user.isPaid,
+      };
+    } else {
+      // Si no existe, revisar mocks
+      if (payload.email === MOCK_USERS.student.email) {
+        userData = { ...MOCK_USERS.student, id: payload.userId };
+      } else if (payload.email === MOCK_USERS.admin.email) {
+        userData = { ...MOCK_USERS.admin, id: payload.userId };
+      } else {
+        // El usuario ya no existe o es un mock user viejo
+        return NextResponse.json({ user: null }, { status: 200 });
       }
-      return NextResponse.json({ user });
-    } catch (dbError) {
-      // Si la DB falla pero el token es de un usuario real, no podemos recuperarlo,
-      // pero si es mock ya lo manejamos arriba.
-      return NextResponse.json({ error: 'Error de conexión a la base de datos.' }, { status: 500 });
     }
-  } catch (err) {
-    return NextResponse.json({ error: 'Token inválido.' }, { status: 401 });
+
+    return NextResponse.json({ user: userData }, { status: 200 });
+  } catch (error) {
+    // Si el token expiró o es inválido, devolvemos user: null silenciosamente
+    return NextResponse.json({ user: null }, { status: 200 });
   }
 }

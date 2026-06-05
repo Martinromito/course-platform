@@ -1,21 +1,16 @@
 // src/app/api/orders/[id]/route.ts
-// GET — Retorna detalle de un pedido específico del usuario
+// GET — Retorna detalle de un pedido específico del usuario (JSON)
 
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/middleware';
-import { connectDB } from '@/lib/db/mongodb';
-import Order from '@/lib/models/Order';
+import { getOrders } from '@/lib/data';
 
 export const GET = withAuth(async (_req: NextRequest, user, context) => {
   try {
     const { id } = await context!.params;
+    const orders = await getOrders();
 
-    await connectDB();
-
-    const order = await Order.findOne({
-      _id: id,
-      userId: user.userId,
-    }).lean();
+    const order = orders.find((o) => o._id === id && o.userId === user.userId);
 
     if (!order) {
       return NextResponse.json({ error: 'Pedido no encontrado.' }, { status: 404 });

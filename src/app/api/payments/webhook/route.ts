@@ -3,10 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
-import { connectDB } from '@/lib/db/mongodb';
-import Order from '@/lib/models/Order';
-import User from '@/lib/models/User';
-import { getProducts, saveProducts, getCoupons, saveCoupons } from '@/lib/data';
+import { getProducts, saveProducts, getCoupons, saveCoupons, getOrders, saveOrders, getUsers, saveUsers } from '@/lib/data';
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN!,
@@ -32,13 +29,15 @@ export async function POST(req: NextRequest) {
     const orderId = payment.external_reference;
     const status = payment.status;
 
-    await connectDB();
-    const order = await Order.findById(orderId);
+    const orders = await getOrders();
+    const orderIndex = orders.findIndex(o => o._id === orderId);
 
-    if (!order) {
+    if (orderIndex === -1) {
       console.error('[WEBHOOK] Pedido no encontrado:', orderId);
       return NextResponse.json({ error: 'Pedido no encontrado.' }, { status: 404 });
     }
+
+    const order = orders[orderIndex];
 
     // Evitar procesar dos veces el mismo pago si ya está aprobado
     if (order.status === 'approved' && status === 'approved') {
@@ -46,21 +45,21 @@ export async function POST(req: NextRequest) {
     }
 
     order.mpPaymentId = String(payment.id);
+    order.updatedAt = new Date().toISOString();
 
     if (status === 'approved') {
       order.status = 'approved';
-      await order.save();
 
-      // 1. Actualizar isPaid del User (si corresponde dar acceso a cursos)
-      // Como ahora vendemos productos físicos también, podríamos dar acceso a cursos 
-      // si compraron uno, pero para no complicar, asumimos que todos los clientes de MP pagan la membresía/curso
-      // o ajustamos la lógica. Por ahora mantenemos la actualización del user:
-      const user = await User.findById(order.userId);
-      if (user && !user.isPaid) {
-          user.isPaid = true;
-          user.paymentDate = new Date();
-          user.paymentStatus = 'approved';
-          await user.save();
+      // 1. Actualizar isPaid del User en JSON
+      try {
+        const users = await getUsers();
+        const userIndex = users.findIndex(u => u._id === order.userId);
+        if (userIndex !== -1 && !users[userIndex].isPaid) {
+          users[userIndex].isPaid = true;
+          await saveUsers(users);
+        }
+      } catch (err) {
+        console.error('[WEBHOOK] Error actualizando usuario:', err);
       }
 
       // 2. Descontar stock de productos (JSON)
@@ -100,8 +99,10 @@ export async function POST(req: NextRequest) {
       console.log(`[WEBHOOK] Pedido ${orderId} aprobado`);
     } else if (status === 'rejected' || status === 'refunded') {
       order.status = status as 'rejected' | 'refunded';
-      await order.save();
     }
+
+    // Guardar los cambios en el pedido
+    await saveOrders(orders);
 
     return NextResponse.json({ message: 'Webhook procesado.' }, { status: 200 });
   } catch (error) {
