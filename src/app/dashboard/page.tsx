@@ -370,92 +370,28 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-16 sm:pb-20">
         <div className="mb-8 sm:mb-12">
           <h1 className="text-2xl sm:text-4xl font-black text-[#1A1A1A]">¡Hola de nuevo, {user?.name}! 👋</h1>
-          <p className="text-[#705E45] mt-2 sm:mt-3 font-medium text-sm sm:text-lg">Es un gran día para seguir creando algo hermoso.</p>
+          <p className="text-[#705E45] mt-2 sm:mt-3 font-medium text-sm sm:text-lg">Te damos la bienvenida a tu cuenta.</p>
         </div>
 
-        {!user?.isPaid ? (
-          <div className="bg-white border border-[#E5E0D8] rounded-[28px] sm:rounded-[40px] p-8 sm:p-12 text-center shadow-xl shadow-[#b04b2b]/5">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#C5A059]/20 rounded-full flex items-center justify-center mx-auto mb-5 sm:mb-6 text-2xl sm:text-3xl">🔒</div>
-            <h2 className="text-2xl sm:text-3xl font-black text-[#1A1A1A] mb-3 sm:mb-4">Acceso Limitado</h2>
-            <p className="text-[#4A4A4A] max-w-2xl mx-auto mb-8 sm:mb-10 text-base sm:text-lg leading-relaxed">
-              Tu cuenta está activa, pero aún no tienes acceso completo a la academia. 
-              Inscríbete hoy para desbloquear todos los proyectos y empezar a aprender con nosotros.
-            </p>
-            <Button size="xl" onClick={() => router.push('/#precio')}>
-              Desbloquear Academia ahora
-            </Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            <div className="lg:col-span-2 space-y-8">
-              <h2 className="text-2xl font-black text-[#1A1A1A]">Tu Contenido</h2>
-              {modules.length > 0 ? (
-                modules.map((mod, idx) => {
-                  const isExpanded = expandedModules[mod._id];
-                  return (
-                    <div key={mod._id} className="bg-white border border-[#E5E0D8] rounded-[32px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                      <button 
-                        onClick={() => toggleModule(mod._id)}
-                        className="w-full p-6 sm:p-8 bg-[#FAF9F6] flex justify-between items-center text-left group"
-                      >
-                        <div className="flex items-center gap-4 sm:gap-6">
-                          <div className="w-12 h-12 rounded-2xl bg-[#C5A059]/20 flex items-center justify-center text-[#8B7355] font-black text-xl group-hover:scale-110 transition-transform">
-                            {idx + 1}
-                          </div>
-                          <div>
-                            <h3 className="font-bold text-[#1A1A1A] text-lg sm:text-xl group-hover:text-[#8B7355] transition-colors">{mod.title}</h3>
-                            <span className="text-xs font-bold text-[#8B7355] uppercase tracking-widest">{mod.lessons.length} lecciones</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <span className="hidden sm:inline-block text-xs font-black text-[#705E45] uppercase tracking-widest">{isExpanded ? 'Ver menos' : 'Ver contenido'}</span>
-                          <div className={`w-10 h-10 rounded-full bg-white border border-[#E5E0D8] flex items-center justify-center text-[#8B7355] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                        </div>
-                      </button>
-                      
-                      <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                        <div className="divide-y divide-[#E5E0D8]/30 border-t border-[#E5E0D8]">
-                          {mod.lessons.map((lesson) => (
-                            <button
-                              key={lesson._id}
-                              onClick={() => router.push(`/dashboard/course/${mod._id}/${lesson._id}`)}
-                              className="w-full flex items-center justify-between p-5 sm:p-6 hover:bg-[#FAF9F6] transition-colors text-left group/lesson"
-                            >
-                              <div className="flex items-center gap-5">
-                                <div className="w-10 h-10 rounded-xl bg-[#d7ccc8]/20 flex items-center justify-center text-[#8B7355] group-hover/lesson:bg-[#8B7355] group-hover/lesson:text-white transition-all">
-                                  <span className="text-xs">▶</span>
-                                </div>
-                                <div>
-                                  <span className="text-[#1A1A1A] font-bold group-hover/lesson:text-[#8B7355] transition-colors">{lesson.title}</span>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                {lesson.isPreview && !user?.isPaid && (
-                                  <span className="text-[10px] font-bold bg-green-100 text-green-700 px-3 py-1 rounded-full uppercase tracking-wider border border-green-200">
-                                    Clase abierta
-                                  </span>
-                                )}
-                                <span className="text-[#8B7355] font-bold text-xs opacity-0 group-hover/lesson:opacity-100 transition-opacity">Comenzar →</span>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="bg-white border border-[#E5E0D8] rounded-3xl p-12 text-center">
-                  <p className="text-[#705E45]">No hay contenido disponible todavía.</p>
-                </div>
-              )}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Columna Izquierda: Información de Cuenta y Pedidos */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-white border border-[#E5E0D8] rounded-[32px] p-8 shadow-sm">
+              <h2 className="text-xl font-black text-[#1A1A1A] mb-2">Mi Cuenta</h2>
+              <p className="text-sm font-medium text-[#705E45] mb-6">{user?.email}</p>
+              
+              <div className="pt-6 border-t border-[#E5E0D8]">
+                <h3 className="text-sm font-black text-[#1A1A1A] uppercase tracking-widest mb-4">Mis Compras</h3>
+                <p className="text-sm text-[#4A4A4A] mb-6 leading-relaxed">
+                  Haz el seguimiento de tus pedidos y productos físicos.
+                </p>
+                <Button variant="outline" size="md" className="w-full" onClick={() => router.push('/mis-pedidos')}>
+                  Ver mis pedidos
+                </Button>
+              </div>
             </div>
 
-            <div className="space-y-8">
+            {user?.isPaid && (
               <div className="bg-white border border-[#E5E0D8] rounded-3xl p-8 shadow-sm">
                 <h2 className="text-xl font-black text-[#1A1A1A] mb-6">Tu progreso</h2>
                 <div className="w-full bg-[#FAF9F6] rounded-full h-3 mb-3 border border-[#E5E0D8]/30">
@@ -465,18 +401,104 @@ export default function DashboardPage() {
                   ></div>
                 </div>
                 <p className="text-sm font-bold text-[#705E45]">{progressPercent}% completado</p>
-                
-                <div className="mt-8 pt-8 border-t border-[#E5E0D8]">
-                  <h3 className="text-sm font-black text-[#1A1A1A] uppercase tracking-widest mb-4">Ayuda Personalizada</h3>
-                  <p className="text-sm text-[#4A4A4A] mb-6 leading-relaxed">¿Tienes dudas con algún proyecto? Estamos aquí para ayudarte.</p>
-                  <Button variant="outline" size="md" className="w-full">
-                    Enviar mensaje
+              </div>
+            )}
+            
+            <div className="bg-[#FAF9F6] border border-[#E5E0D8] rounded-3xl p-8">
+              <h3 className="text-sm font-black text-[#1A1A1A] uppercase tracking-widest mb-4">Ayuda Personalizada</h3>
+              <p className="text-sm text-[#4A4A4A] mb-6 leading-relaxed">¿Tienes dudas con algún proyecto o pedido? Estamos aquí para ayudarte.</p>
+              <Button variant="outline" size="md" className="w-full" onClick={() => router.push('/contacto')}>
+                Enviar mensaje
+              </Button>
+            </div>
+          </div>
+
+          {/* Columna Derecha: Academia / Cursos */}
+          <div className="lg:col-span-2">
+            {!user?.isPaid ? (
+              <div className="bg-white border border-[#E5E0D8] rounded-[28px] sm:rounded-[40px] p-8 sm:p-12 text-center shadow-xl shadow-[#b04b2b]/5 h-full flex flex-col justify-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#C5A059]/20 rounded-full flex items-center justify-center mx-auto mb-5 sm:mb-6 text-2xl sm:text-3xl">🎓</div>
+                <h2 className="text-2xl sm:text-3xl font-black text-[#1A1A1A] mb-3 sm:mb-4">Mi Academia</h2>
+                <p className="text-[#4A4A4A] max-w-2xl mx-auto mb-8 sm:mb-10 text-base sm:text-lg leading-relaxed">
+                  Aún no estás inscripto en nuestros cursos online. Desbloquea todos los proyectos y aprende las mejores técnicas de cestería paso a paso.
+                </p>
+                <div>
+                  <Button size="xl" onClick={() => router.push('/cursos')}>
+                    Ver cursos disponibles
                   </Button>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-8">
+                <h2 className="text-2xl font-black text-[#1A1A1A]">Mi Academia</h2>
+                {modules.length > 0 ? (
+                  modules.map((mod, idx) => {
+                    const isExpanded = expandedModules[mod._id];
+                    return (
+                      <div key={mod._id} className="bg-white border border-[#E5E0D8] rounded-[32px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <button 
+                          onClick={() => toggleModule(mod._id)}
+                          className="w-full p-6 sm:p-8 bg-[#FAF9F6] flex justify-between items-center text-left group"
+                        >
+                          <div className="flex items-center gap-4 sm:gap-6">
+                            <div className="w-12 h-12 rounded-2xl bg-[#C5A059]/20 flex items-center justify-center text-[#8B7355] font-black text-xl group-hover:scale-110 transition-transform">
+                              {idx + 1}
+                            </div>
+                            <div>
+                              <h3 className="font-bold text-[#1A1A1A] text-lg sm:text-xl group-hover:text-[#8B7355] transition-colors">{mod.title}</h3>
+                              <span className="text-xs font-bold text-[#8B7355] uppercase tracking-widest">{mod.lessons.length} lecciones</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="hidden sm:inline-block text-xs font-black text-[#705E45] uppercase tracking-widest">{isExpanded ? 'Ver menos' : 'Ver contenido'}</span>
+                            <div className={`w-10 h-10 rounded-full bg-white border border-[#E5E0D8] flex items-center justify-center text-[#8B7355] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </div>
+                          </div>
+                        </button>
+                        
+                        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                          <div className="divide-y divide-[#E5E0D8]/30 border-t border-[#E5E0D8]">
+                            {mod.lessons.map((lesson) => (
+                              <button
+                                key={lesson._id}
+                                onClick={() => router.push(`/dashboard/course/${mod._id}/${lesson._id}`)}
+                                className="w-full flex items-center justify-between p-5 sm:p-6 hover:bg-[#FAF9F6] transition-colors text-left group/lesson"
+                              >
+                                <div className="flex items-center gap-5">
+                                  <div className="w-10 h-10 rounded-xl bg-[#d7ccc8]/20 flex items-center justify-center text-[#8B7355] group-hover/lesson:bg-[#8B7355] group-hover/lesson:text-white transition-all">
+                                    <span className="text-xs">▶</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-[#1A1A1A] font-bold group-hover/lesson:text-[#8B7355] transition-colors">{lesson.title}</span>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  {lesson.isPreview && !user?.isPaid && (
+                                    <span className="text-[10px] font-bold bg-green-100 text-green-700 px-3 py-1 rounded-full uppercase tracking-wider border border-green-200">
+                                      Clase abierta
+                                    </span>
+                                  )}
+                                  <span className="text-[#8B7355] font-bold text-xs opacity-0 group-hover/lesson:opacity-100 transition-opacity">Comenzar →</span>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="bg-white border border-[#E5E0D8] rounded-3xl p-12 text-center">
+                    <p className="text-[#705E45]">No hay contenido disponible todavía.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </main>
     </div>
   );

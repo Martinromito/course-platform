@@ -1,0 +1,30 @@
+[
+  {
+    "_id": "ord-1780682600517-ihjj07x",
+    "userId": "user-1780682351386-0dzivk9",
+    "items": [
+      {
+        "productId": "prod-1",
+        "name": "Kit Paleta Completa",
+        "quantity": 3,
+        "unitPrice": 60030,
+        "image": "/images/product-kit.png"
+      }
+    ],
+    "subtotal": 180090,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 180090,
+    "status": "pending",
+    "shippingAddress": {
+      "name": "martin",
+      "phone": "02323543638",
+      "address": "25 de Mayo 1453",
+      "city": "LUJAN - LUJAN",
+      "province": "Buenos Aires",
+      "zip": "6700"
+    },
+    "createdAt": "2026-06-05T18:03:20.517Z",
+    "updatedAt": "2026-06-05T18:03:20.517Z"
+  }
+]
