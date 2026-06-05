@@ -95,9 +95,12 @@ export default function AdminPage() {
         <div className="flex justify-between items-center mb-12">
           <div>
             <h1 className="text-3xl font-black text-[#3e2723]">Panel de Control</h1>
-            <p className="text-[#8d6e63] mt-2 font-medium">Gestiona tu academia y tus alumnas.</p>
+            <p className="text-[#8d6e63] mt-2 font-medium">Gestiona tu academia, alumnas y pedidos.</p>
           </div>
-          <Button variant="outline" onClick={() => router.push('/dashboard')}>Volver al sitio</Button>
+          <div className="flex gap-3">
+            <Button onClick={() => router.push('/admin/pedidos')}>Gestionar Pedidos</Button>
+            <Button variant="outline" onClick={() => router.push('/dashboard')}>Volver al sitio</Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
