@@ -5,6 +5,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import os from 'os';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -102,7 +103,15 @@ export interface Order {
 
 // ─── File Paths ──────────────────────────────────────────────────────────────
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+const TEMPLATE_DIR = path.join(process.cwd(), 'data');
+
+// Vercel y Lambda tienen sistemas de archivos de solo lectura (EROFS).
+// Redirigimos la escritura de archivos JSON a /tmp en entornos de producción.
+const IS_SERVERLESS = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+const DATA_DIR = IS_SERVERLESS
+  ? path.join(os.tmpdir(), 'lamackenna-data')
+  : TEMPLATE_DIR;
+
 const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
 const WORKSHOPS_FILE = path.join(DATA_DIR, 'workshops.json');
 const COUPONS_FILE = path.join(DATA_DIR, 'coupons.json');
@@ -110,10 +119,31 @@ const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
 const LOGIN_CODES_FILE = path.join(DATA_DIR, 'login_codes.json');
 
+// Asegura que los archivos existan en la ruta de trabajo (copia de plantillas si es /tmp)
+async function ensureFileExists(filePath: string): Promise<void> {
+  try {
+    await fs.access(filePath);
+  } catch {
+    const filename = path.basename(filePath);
+    const templatePath = path.join(TEMPLATE_DIR, filename);
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
+    
+    try {
+      const content = await fs.readFile(templatePath, 'utf-8');
+      await fs.writeFile(filePath, content, 'utf-8');
+    } catch {
+      // Si la plantilla no existe (por ejemplo, login_codes.json), inicializar con un contenido vacío
+      const emptyContent = filename === 'settings.json' ? '{}' : '[]';
+      await fs.writeFile(filePath, emptyContent, 'utf-8');
+    }
+  }
+}
+
 // ─── Generic read/write ──────────────────────────────────────────────────────
 
 async function readJSON<T>(filePath: string): Promise<T[]> {
   try {
+    await ensureFileExists(filePath);
     const raw = await fs.readFile(filePath, 'utf-8');
     return JSON.parse(raw) as T[];
   } catch {
@@ -122,6 +152,7 @@ async function readJSON<T>(filePath: string): Promise<T[]> {
 }
 
 async function writeJSON<T>(filePath: string, data: T[]): Promise<void> {
+  await ensureFileExists(filePath);
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
 }
@@ -229,6 +260,7 @@ export async function saveOrders(orders: Order[]): Promise<void> {
 
 export async function getSettings(): Promise<Settings> {
   try {
+    await ensureFileExists(SETTINGS_FILE);
     const raw = await fs.readFile(SETTINGS_FILE, 'utf-8');
     return JSON.parse(raw) as Settings;
   } catch {
