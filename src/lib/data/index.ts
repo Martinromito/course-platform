@@ -1,11 +1,12 @@
 // src/lib/data/index.ts
-// Helpers para leer/escribir los archivos JSON de productos, talleres, cupones y pedidos
-// Actúa como mini-DB local sin dependencias externas
+// Capa de datos unificada: Redis (Upstash) como almacenamiento primario, JSON local como fallback.
+// Productos y talleres se leen siempre de JSON (catálogo estático).
+// Órdenes, cupones, configuración y códigos de login usan Redis cuando está disponible.
 
 import { promises as fs } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import os from 'os';
+import { kvGet, kvSet, hasRedis } from '@/lib/kv';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -103,47 +104,22 @@ export interface Order {
 
 // ─── File Paths ──────────────────────────────────────────────────────────────
 
-const TEMPLATE_DIR = path.join(process.cwd(), 'data');
+const DATA_DIR = path.join(process.cwd(), 'data');
 
-// Vercel y Lambda tienen sistemas de archivos de solo lectura (EROFS).
-// Redirigimos la escritura de archivos JSON a /tmp en entornos de producción.
-const IS_SERVERLESS = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
-const DATA_DIR = IS_SERVERLESS
-  ? path.join(os.tmpdir(), 'lamackenna-data')
-  : TEMPLATE_DIR;
-
+// Productos y talleres son catálogo estático — siempre se leen de JSON
 const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
 const WORKSHOPS_FILE = path.join(DATA_DIR, 'workshops.json');
+
+// JSON local para cupones, órdenes, configuración y códigos (fallback cuando Redis no está disponible)
 const COUPONS_FILE = path.join(DATA_DIR, 'coupons.json');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
 const LOGIN_CODES_FILE = path.join(DATA_DIR, 'login_codes.json');
 
-// Asegura que los archivos existan en la ruta de trabajo (copia de plantillas si es /tmp)
-async function ensureFileExists(filePath: string): Promise<void> {
-  try {
-    await fs.access(filePath);
-  } catch {
-    const filename = path.basename(filePath);
-    const templatePath = path.join(TEMPLATE_DIR, filename);
-    await fs.mkdir(path.dirname(filePath), { recursive: true });
-    
-    try {
-      const content = await fs.readFile(templatePath, 'utf-8');
-      await fs.writeFile(filePath, content, 'utf-8');
-    } catch {
-      // Si la plantilla no existe (por ejemplo, login_codes.json), inicializar con un contenido vacío
-      const emptyContent = filename === 'settings.json' ? '{}' : '[]';
-      await fs.writeFile(filePath, emptyContent, 'utf-8');
-    }
-  }
-}
-
-// ─── Generic read/write ──────────────────────────────────────────────────────
+// ─── Generic read/write (solo para catálogo estático) ────────────────────────
 
 async function readJSON<T>(filePath: string): Promise<T[]> {
   try {
-    await ensureFileExists(filePath);
     const raw = await fs.readFile(filePath, 'utf-8');
     return JSON.parse(raw) as T[];
   } catch {
@@ -152,9 +128,27 @@ async function readJSON<T>(filePath: string): Promise<T[]> {
 }
 
 async function writeJSON<T>(filePath: string, data: T[]): Promise<void> {
-  await ensureFileExists(filePath);
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+// ─── Redis-first helper para datos mutables ───────────────────────────────────
+// Si Redis está disponible lo usa; si no, cae en el archivo JSON local.
+
+async function kvReadArray<T>(key: string, fallbackFile: string): Promise<T[]> {
+  if (hasRedis()) {
+    const result = await kvGet<T[]>(key);
+    return result ?? [];
+  }
+  return readJSON<T>(fallbackFile);
+}
+
+async function kvWriteArray<T>(key: string, fallbackFile: string, data: T[]): Promise<void> {
+  if (hasRedis()) {
+    await kvSet(key, data);
+    return;
+  }
+  return writeJSON<T>(fallbackFile, data);
 }
 
 // ─── Products ────────────────────────────────────────────────────────────────
@@ -200,11 +194,11 @@ export async function saveWorkshops(workshops: Workshop[]): Promise<void> {
 // ─── Coupons ─────────────────────────────────────────────────────────────────
 
 export async function getCoupons(): Promise<Coupon[]> {
-  return readJSON<Coupon>(COUPONS_FILE);
+  return kvReadArray<Coupon>('coupons', COUPONS_FILE);
 }
 
 export async function saveCoupons(coupons: Coupon[]): Promise<void> {
-  return writeJSON(COUPONS_FILE, coupons);
+  return kvWriteArray('coupons', COUPONS_FILE, coupons);
 }
 
 export async function validateCoupon(
@@ -249,39 +243,48 @@ export async function validateCoupon(
 // ─── Orders ──────────────────────────────────────────────────────────────────
 
 export async function getOrders(): Promise<Order[]> {
-  return readJSON<Order>(ORDERS_FILE);
+  return kvReadArray<Order>('orders', ORDERS_FILE);
 }
 
 export async function saveOrders(orders: Order[]): Promise<void> {
-  return writeJSON(ORDERS_FILE, orders);
+  return kvWriteArray('orders', ORDERS_FILE, orders);
 }
 
 // ─── Settings ────────────────────────────────────────────────────────────────
 
+const DEFAULT_SETTINGS: Settings = {
+  shopName: "La Mackenna",
+  shopTitle: "Creá piezas únicas para tu hogar y tus proyectos creativos",
+  shopSubtitle: "Descubrí productos artesanales, insumos exclusivos y capacitaciones para aprender nuevas técnicas.",
+  shopImage: "/images/hero.png",
+  shopLogo: "/logo.png",
+  statsProducts: "200+",
+  statsWorkshops: "10+",
+  statsAlumnas: "1.500+",
+  bankAlias: "lamackenna.arte",
+  bankCbu: "0070000000000000000000",
+  bankName: "Galicia",
+  bankOwner: "La Mackenna"
+};
+
 export async function getSettings(): Promise<Settings> {
+  if (hasRedis()) {
+    const result = await kvGet<Settings>('settings');
+    return result ?? DEFAULT_SETTINGS;
+  }
   try {
-    await ensureFileExists(SETTINGS_FILE);
     const raw = await fs.readFile(SETTINGS_FILE, 'utf-8');
     return JSON.parse(raw) as Settings;
   } catch {
-    return {
-      shopName: "La Mackenna",
-      shopTitle: "Creá piezas únicas para tu hogar y tus proyectos creativos",
-      shopSubtitle: "Descubrí productos artesanales, insumos exclusivos y capacitaciones para aprender nuevas técnicas.",
-      shopImage: "/images/hero.png",
-      shopLogo: "/logo.png",
-      statsProducts: "200+",
-      statsWorkshops: "10+",
-      statsAlumnas: "1.500+",
-      bankAlias: "lamackenna.arte",
-      bankCbu: "0070000000000000000000",
-      bankName: "Galicia",
-      bankOwner: "La Mackenna"
-    };
+    return DEFAULT_SETTINGS;
   }
 }
 
 export async function saveSettings(settings: Settings): Promise<void> {
+  if (hasRedis()) {
+    await kvSet('settings', settings);
+    return;
+  }
   await fs.mkdir(path.dirname(SETTINGS_FILE), { recursive: true });
   await fs.writeFile(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf-8');
 }
@@ -295,11 +298,11 @@ export interface LoginCode {
 }
 
 export async function getLoginCodes(): Promise<LoginCode[]> {
-  return readJSON<LoginCode>(LOGIN_CODES_FILE);
+  return kvReadArray<LoginCode>('login_codes', LOGIN_CODES_FILE);
 }
 
 export async function saveLoginCodes(codes: LoginCode[]): Promise<void> {
-  return writeJSON(LOGIN_CODES_FILE, codes);
+  return kvWriteArray('login_codes', LOGIN_CODES_FILE, codes);
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
