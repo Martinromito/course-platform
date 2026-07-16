@@ -1,12 +1,15 @@
 // src/app/admin/pedidos/page.tsx
+// Gestión de Pedidos y Despachos (Admin)
+
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import Navbar from '@/components/landing/Navbar';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import toast from 'react-hot-toast';
+import { ArrowLeft, Landmark, CreditCard, Search, ArrowRight, Loader2 } from 'lucide-react';
 
 interface OrderItem {
   productId: string;
@@ -14,6 +17,7 @@ interface OrderItem {
   quantity: number;
   unitPrice: number;
   image: string;
+  itemType: 'product' | 'workshop';
 }
 
 interface ShippingAddress {
@@ -27,63 +31,67 @@ interface ShippingAddress {
 
 interface Order {
   _id: string;
-  userId: string;
+  buyerName: string;
+  buyerEmail: string;
+  buyerPhone: string;
   items: OrderItem[];
   subtotal: number;
   couponCode?: string;
   couponDiscount: number;
   shippingCost: number;
   total: number;
-  status: 'pending' | 'approved' | 'rejected' | 'refunded';
+  status: 'pending' | 'pending_transfer' | 'approved' | 'rejected' | 'refunded';
+  paymentMethod: 'mercadopago' | 'transfer';
   shippingAddress?: ShippingAddress;
   createdAt: string;
   updatedAt: string;
-  user: {
-    name: string;
-    email: string;
-  };
 }
 
 export default function AdminOrdersPage() {
-  const { user: currentUser, loading: authLoading } = useAuth();
   const router = useRouter();
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'refunded'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'pending_transfer' | 'approved' | 'rejected' | 'refunded'>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!authLoading) {
-      if (!currentUser) {
-        router.push('/login');
-      } else if (currentUser.role !== 'admin') {
-        router.push('/dashboard');
-      }
-    }
-
-    const fetchOrders = async () => {
+    const checkAuth = async () => {
       try {
-        const res = await fetch('/api/admin/orders');
-        const data = await res.json();
-        if (res.ok) {
-          setOrders(data.orders);
-        } else {
-          toast.error(data.error || 'Error al obtener pedidos');
+        const checkRes = await fetch('/api/admin/check');
+        const checkData = await checkRes.json();
+
+        if (!checkData.authenticated) {
+          router.push('/admin/login');
+          return;
         }
-      } catch (err) {
-        toast.error('Error de red al cargar pedidos');
-      } finally {
-        setLoading(false);
+        await fetchOrders();
+      } catch {
+        toast.error('Error de autenticación');
+        router.push('/admin/login');
       }
     };
 
-    if (currentUser?.role === 'admin') {
-      fetchOrders();
+    checkAuth();
+  }, [router]);
+
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch('/api/admin/orders');
+      const data = await res.json();
+      if (res.ok) {
+        setOrders(data.orders || []);
+      } else {
+        toast.error(data.error || 'Error al obtener pedidos');
+      }
+    } catch (err) {
+      toast.error('Error de red al cargar pedidos');
+    } finally {
+      setLoading(false);
     }
-  }, [currentUser, authLoading, router]);
+  };
 
   const handleUpdateStatus = async (orderId: string, status: string) => {
     setUpdatingId(orderId);
@@ -110,13 +118,10 @@ export default function AdminOrdersPage() {
     }
   };
 
-  if (authLoading || loading) {
+  if (loading && orders.length === 0) {
     return (
-      <div className="min-h-screen bg-[#fdfaf5] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#8B7355] mx-auto"></div>
-          <p className="text-[#8d6e63] mt-4 font-bold">Cargando panel de pedidos...</p>
-        </div>
+      <div className="min-h-screen bg-[#FAF8F4] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-[#8B7355]" />
       </div>
     );
   }
@@ -125,9 +130,9 @@ export default function AdminOrdersPage() {
   const filteredOrders = orders.filter(o => {
     const matchesSearch = 
       o._id.toLowerCase().includes(search.toLowerCase()) ||
-      o.user.name.toLowerCase().includes(search.toLowerCase()) ||
-      o.user.email.toLowerCase().includes(search.toLowerCase()) ||
-      (o.shippingAddress?.phone && o.shippingAddress.phone.includes(search));
+      o.buyerName.toLowerCase().includes(search.toLowerCase()) ||
+      o.buyerEmail.toLowerCase().includes(search.toLowerCase()) ||
+      o.buyerPhone.includes(search);
       
     const matchesStatus = statusFilter === 'all' || o.status === statusFilter;
     
@@ -138,73 +143,74 @@ export default function AdminOrdersPage() {
   const stats = {
     total: orders.length,
     approved: orders.filter(o => o.status === 'approved').length,
-    pending: orders.filter(o => o.status === 'pending').length,
+    pending: orders.filter(o => o.status === 'pending' || o.status === 'pending_transfer').length,
     earnings: orders.filter(o => o.status === 'approved').reduce((sum, o) => sum + o.total, 0),
   };
 
   return (
-    <div className="min-h-screen bg-[#fdfaf5] p-6 sm:p-8">
+    <div className="min-h-screen bg-[#FAF8F4] p-6 sm:p-8 pt-28">
+      <Navbar />
+
       <div className="max-w-7xl mx-auto">
         {/* Encabezado */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-black text-[#3e2723]">Pedidos & Despachos</h1>
-            <p className="text-[#8d6e63] mt-1 font-medium">Controla los pagos, envíos y correos de tus clientas.</p>
-          </div>
-          <div className="flex gap-3 w-full sm:w-auto">
-            <Button variant="outline" onClick={() => router.push('/admin')}>
-              Volver a Academia
-            </Button>
-            <Button variant="ghost" onClick={() => router.push('/dashboard')}>
-              Ir al Sitio
-            </Button>
+            <button
+              onClick={() => router.push('/admin')}
+              className="flex items-center gap-1.5 text-xs text-[#8B7355] font-semibold uppercase tracking-wider mb-2 hover:underline"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> Volver al Panel
+            </button>
+            <h1 className="text-3xl font-black text-[#1A1A1A]">Pedidos & Ventas</h1>
+            <p className="text-[#7A6E60] mt-1 font-medium">Controla los pagos, envíos y accesos de tus clientas.</p>
           </div>
         </div>
 
         {/* Tarjetas de Estadísticas */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10">
-          <div className="bg-white border border-[#d7ccc8] rounded-3xl p-5 shadow-sm">
-            <p className="text-[#8d6e63] text-xs font-bold uppercase tracking-wider">Total Recaudado</p>
+          <div className="bg-white border border-[#E8E2D9] rounded-2xl p-5 shadow-sm">
+            <p className="text-[#7A6E60] text-xs font-bold uppercase tracking-wider">Total Recaudado</p>
             <h3 className="text-2xl font-black text-green-700 mt-1">
               ${stats.earnings.toLocaleString('es-AR')}
             </h3>
           </div>
-          <div className="bg-white border border-[#d7ccc8] rounded-3xl p-5 shadow-sm">
-            <p className="text-[#8d6e63] text-xs font-bold uppercase tracking-wider">Total Pedidos</p>
-            <h3 className="text-2xl font-black text-[#3e2723] mt-1">{stats.total}</h3>
+          <div className="bg-white border border-[#E8E2D9] rounded-2xl p-5 shadow-sm">
+            <p className="text-[#7A6E60] text-xs font-bold uppercase tracking-wider">Total Pedidos</p>
+            <h3 className="text-2xl font-black text-[#1A1A1A] mt-1">{stats.total}</h3>
           </div>
-          <div className="bg-white border border-[#d7ccc8] rounded-3xl p-5 shadow-sm">
-            <p className="text-[#8d6e63] text-xs font-bold uppercase tracking-wider">Aprobados</p>
+          <div className="bg-white border border-[#E8E2D9] rounded-2xl p-5 shadow-sm">
+            <p className="text-[#7A6E60] text-xs font-bold uppercase tracking-wider">Aprobados</p>
             <h3 className="text-2xl font-black text-green-600 mt-1">{stats.approved}</h3>
           </div>
-          <div className="bg-white border border-[#d7ccc8] rounded-3xl p-5 shadow-sm">
-            <p className="text-[#8d6e63] text-xs font-bold uppercase tracking-wider">Pendientes</p>
+          <div className="bg-white border border-[#E8E2D9] rounded-2xl p-5 shadow-sm">
+            <p className="text-[#7A6E60] text-xs font-bold uppercase tracking-wider">Pendientes</p>
             <h3 className="text-2xl font-black text-amber-600 mt-1">{stats.pending}</h3>
           </div>
         </div>
 
         {/* Buscador y Filtro */}
-        <div className="bg-white border border-[#d7ccc8] rounded-3xl p-6 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="bg-white border border-[#E8E2D9] rounded-2xl p-6 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="w-full md:w-1/2">
             <Input
               label="Buscar pedido (ID, nombre, email o teléfono)"
               placeholder="Ej: martin o 02323..."
               value={search}
               onChange={e => setSearch(e.target.value)}
+              className="text-slate-800"
             />
           </div>
           <div className="flex gap-2 w-full md:w-auto self-end md:self-auto overflow-x-auto pb-1 md:pb-0">
-            {(['all', 'pending', 'approved', 'rejected', 'refunded'] as const).map(status => (
+            {(['all', 'pending', 'pending_transfer', 'approved', 'rejected', 'refunded'] as const).map(status => (
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all ${
+                className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer whitespace-nowrap ${
                   statusFilter === status
                     ? 'bg-[#8B7355] text-white border-[#8B7355] shadow-sm'
-                    : 'bg-[#fdfaf5] text-[#8d6e63] border-[#d7ccc8] hover:bg-white'
+                    : 'bg-[#FAF8F4] text-[#7A6E60] border-[#E8E2D9] hover:bg-white'
                 }`}
               >
-                {status === 'all' ? 'Todos' : status === 'pending' ? 'Pendiente' : status === 'approved' ? 'Aprobado' : status === 'rejected' ? 'Rechazado' : 'Reembolsado'}
+                {status === 'all' ? 'Todos' : status === 'pending' ? 'Pend. MP' : status === 'pending_transfer' ? 'Pend. Transfer' : status === 'approved' ? 'Aprobado' : status === 'rejected' ? 'Rechazado' : 'Reembolsado'}
               </button>
             ))}
           </div>
@@ -213,48 +219,66 @@ export default function AdminOrdersPage() {
         {/* Contenido Principal */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Tabla de Pedidos */}
-          <div className={`bg-white border border-[#d7ccc8] rounded-[36px] p-6 shadow-sm overflow-hidden lg:col-span-2 ${selectedOrder ? 'hidden lg:block' : ''}`}>
-            <h2 className="text-lg font-black text-[#3e2723] mb-6">Lista de Pedidos ({filteredOrders.length})</h2>
+          <div className={`bg-white border border-[#E8E2D9] rounded-[28px] p-6 shadow-sm overflow-hidden lg:col-span-2 ${selectedOrder ? 'hidden lg:block' : ''}`}>
+            <h2 className="text-lg font-bold text-[#1A1A1A] mb-6">Lista de Pedidos ({filteredOrders.length})</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="text-[#8d6e63] border-b border-[#e7ddd7] text-[10px] uppercase font-bold tracking-widest">
+                  <tr className="text-[#7A6E60] border-b border-[#E8E2D9] text-[10px] uppercase font-bold tracking-widest">
                     <th className="pb-4">Pedido / Fecha</th>
-                    <th className="pb-4">Cliente</th>
+                    <th className="pb-4">Comprador</th>
+                    <th className="pb-4">Tipo de Pago</th>
                     <th className="pb-4">Monto</th>
                     <th className="pb-4">Estado</th>
                     <th className="pb-4 text-right">Detalle</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#f7f2ee]">
+                <tbody className="divide-y divide-[#FAF8F4] text-sm text-[#1A1A1A]">
                   {filteredOrders.map(order => (
-                    <tr key={order._id} className="hover:bg-[#faf6f0] transition-colors">
+                    <tr key={order._id} className="hover:bg-[#FAF8F4]/50 transition-colors">
                       <td className="py-4">
-                        <span className="font-mono text-xs text-[#3e2723] font-bold">#{order._id.substring(0, 8)}</span>
-                        <p className="text-[10px] text-[#8d6e63]">{new Date(order.createdAt).toLocaleDateString('es-AR')}</p>
+                        <span className="font-mono text-xs text-[#1A1A1A] font-bold">#{order._id.substring(0, 8)}</span>
+                        <p className="text-[10px] text-[#7A6E60]">{new Date(order.createdAt).toLocaleDateString('es-AR')}</p>
                       </td>
                       <td className="py-4">
-                        <p className="text-xs font-bold text-[#3e2723]">{order.user.name}</p>
-                        <p className="text-[10px] text-[#8d6e63]">{order.user.email}</p>
+                        <p className="text-xs font-bold text-[#1A1A1A]">{order.buyerName}</p>
+                        <p className="text-[10px] text-[#7A6E60]">{order.buyerEmail}</p>
                       </td>
                       <td className="py-4">
-                        <span className="text-xs font-bold text-[#3e2723]">${order.total.toLocaleString('es-AR')}</span>
+                        <span className="flex items-center gap-1 text-xs">
+                          {order.paymentMethod === 'transfer' ? (
+                            <>
+                              <Landmark className="w-3.5 h-3.5 text-[#8B7355]" />
+                              <span>Transferencia</span>
+                            </>
+                          ) : (
+                            <>
+                              <CreditCard className="w-3.5 h-3.5 text-blue-600" />
+                              <span>Mercado Pago</span>
+                            </>
+                          )}
+                        </span>
                       </td>
                       <td className="py-4">
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                        <span className="font-bold text-[#1A1A1A]">${order.total.toLocaleString('es-AR')}</span>
+                      </td>
+                      <td className="py-4">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
                           order.status === 'approved' ? 'bg-green-100 text-green-700' :
+                          order.status === 'pending_transfer' ? 'bg-purple-100 text-purple-700' :
                           order.status === 'pending' ? 'bg-amber-100 text-amber-700' :
                           'bg-red-100 text-red-700'
                         }`}>
                           {order.status === 'approved' ? 'APROBADO' :
-                           order.status === 'pending' ? 'PENDIENTE' :
+                           order.status === 'pending_transfer' ? 'PEND. TRAN' :
+                           order.status === 'pending' ? 'PEND. MP' :
                            order.status === 'rejected' ? 'RECHAZADO' : 'REEMBOLSADO'}
                         </span>
                       </td>
                       <td className="py-4 text-right">
                         <button
                           onClick={() => setSelectedOrder(order)}
-                          className="px-3 py-1 bg-[#fdfaf5] hover:bg-[#8B7355] text-[#8B7355] hover:text-white border border-[#d7ccc8] hover:border-[#8B7355] rounded-lg text-xs font-bold transition-all cursor-pointer"
+                          className="px-3 py-1 bg-[#FAF8F4] hover:bg-[#8B7355] text-[#8B7355] hover:text-white border border-[#E8E2D9] hover:border-[#8B7355] rounded-lg text-xs font-bold transition-all cursor-pointer"
                         >
                           Ver
                         </button>
@@ -263,7 +287,7 @@ export default function AdminOrdersPage() {
                   ))}
                   {filteredOrders.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="py-8 text-center text-[#8d6e63] text-sm">
+                      <td colSpan={6} className="py-8 text-center text-[#7A6E60] text-sm">
                         No se encontraron pedidos con esos filtros.
                       </td>
                     </tr>
@@ -275,15 +299,15 @@ export default function AdminOrdersPage() {
 
           {/* Panel de Detalle Derecho */}
           {selectedOrder && (
-            <div className="bg-white border border-[#d7ccc8] rounded-[36px] p-6 shadow-sm space-y-6 lg:col-span-1">
-              <div className="flex justify-between items-center pb-4 border-b border-[#e7ddd7]">
+            <div className="bg-white border border-[#E8E2D9] rounded-[28px] p-6 shadow-sm space-y-6 lg:col-span-1">
+              <div className="flex justify-between items-center pb-4 border-b border-[#E8E2D9]">
                 <div>
-                  <h3 className="font-black text-[#3e2723]">Detalle del Pedido</h3>
-                  <p className="font-mono text-xs text-[#8d6e63] mt-0.5">#{selectedOrder._id}</p>
+                  <h3 className="font-bold text-[#1A1A1A]">Detalle del Pedido</h3>
+                  <p className="font-mono text-xs text-[#7A6E60] mt-0.5">#{selectedOrder._id}</p>
                 </div>
                 <button
                   onClick={() => setSelectedOrder(null)}
-                  className="p-1 rounded-full hover:bg-slate-100 text-[#8d6e63]"
+                  className="p-1 rounded-full hover:bg-slate-100 text-[#7A6E60] cursor-pointer"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -292,21 +316,23 @@ export default function AdminOrdersPage() {
               </div>
 
               {/* Estado y Acciones Rápidas */}
-              <div className="bg-[#fdfaf5] border border-[#d7ccc8] rounded-2xl p-4">
+              <div className="bg-[#FAF8F4] border border-[#E8E2D9] rounded-2xl p-4">
                 <div className="flex justify-between items-center mb-3">
-                  <span className="text-xs font-bold text-[#8d6e63]">Estado Actual:</span>
+                  <span className="text-xs font-bold text-[#7A6E60]">Estado Actual:</span>
                   <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                     selectedOrder.status === 'approved' ? 'bg-green-100 text-green-700' :
+                    selectedOrder.status === 'pending_transfer' ? 'bg-purple-100 text-purple-700' :
                     selectedOrder.status === 'pending' ? 'bg-amber-100 text-amber-700' :
                     'bg-red-100 text-red-700'
                   }`}>
                     {selectedOrder.status === 'approved' ? 'APROBADO' :
-                     selectedOrder.status === 'pending' ? 'PENDIENTE' :
+                     selectedOrder.status === 'pending_transfer' ? 'PEND. TRAN' :
+                     selectedOrder.status === 'pending' ? 'PEND. MP' :
                      selectedOrder.status === 'rejected' ? 'RECHAZADO' : 'REEMBOLSADO'}
                   </span>
                 </div>
                 <div className="flex gap-2">
-                  {selectedOrder.status === 'pending' && (
+                  {(selectedOrder.status === 'pending' || selectedOrder.status === 'pending_transfer') && (
                     <Button
                       size="sm"
                       className="w-full text-xs"
@@ -343,52 +369,53 @@ export default function AdminOrdersPage() {
 
               {/* Comprador */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-[#8d6e63] uppercase tracking-wider">Cliente</h4>
-                <div className="p-4 bg-white border border-[#e7ddd7] rounded-2xl">
-                  <p className="text-sm font-bold text-[#3e2723]">{selectedOrder.user.name}</p>
-                  <p className="text-xs text-[#5d4037] mt-0.5">{selectedOrder.user.email}</p>
+                <h4 className="text-xs font-bold text-[#7A6E60] uppercase tracking-wider">Cliente</h4>
+                <div className="p-4 bg-[#FAF8F4] border border-[#E8E2D9] rounded-2xl text-xs space-y-1 text-[#1A1A1A]">
+                  <p><span className="font-bold text-[#7A6E60]">Nombre:</span> {selectedOrder.buyerName}</p>
+                  <p><span className="font-bold text-[#7A6E60]">Email:</span> {selectedOrder.buyerEmail}</p>
+                  <p><span className="font-bold text-[#7A6E60]">Teléfono:</span> {selectedOrder.buyerPhone}</p>
                 </div>
               </div>
 
               {/* Dirección de Envío */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-[#8d6e63] uppercase tracking-wider">Datos de Envío</h4>
-                <div className="p-4 bg-white border border-[#e7ddd7] rounded-2xl space-y-2 text-xs">
+                <h4 className="text-xs font-bold text-[#7A6E60] uppercase tracking-wider">Datos de Envío</h4>
+                <div className="p-4 bg-[#FAF8F4] border border-[#E8E2D9] rounded-2xl space-y-2 text-xs text-[#1A1A1A]">
                   {selectedOrder.shippingAddress ? (
                     <>
-                      <p className="text-[#3e2723]"><span className="font-bold text-[#8d6e63]">Destinatario:</span> {selectedOrder.shippingAddress.name}</p>
-                      <p className="text-[#3e2723]"><span className="font-bold text-[#8d6e63]">Dirección:</span> {selectedOrder.shippingAddress.address}</p>
-                      <p className="text-[#3e2723]"><span className="font-bold text-[#8d6e63]">Ciudad:</span> {selectedOrder.shippingAddress.city}</p>
-                      <p className="text-[#3e2723]"><span className="font-bold text-[#8d6e63]">Provincia:</span> {selectedOrder.shippingAddress.province}</p>
-                      <p className="text-[#3e2723]"><span className="font-bold text-[#8d6e63]">C.P.:</span> {selectedOrder.shippingAddress.zip}</p>
-                      <p className="text-[#3e2723]"><span className="font-bold text-[#8d6e63]">Teléfono:</span> {selectedOrder.shippingAddress.phone}</p>
+                      <p><span className="font-bold text-[#7A6E60]">Destinatario:</span> {selectedOrder.shippingAddress.name}</p>
+                      <p><span className="font-bold text-[#7A6E60]">Dirección:</span> {selectedOrder.shippingAddress.address}</p>
+                      <p><span className="font-bold text-[#7A6E60]">Ciudad:</span> {selectedOrder.shippingAddress.city}</p>
+                      <p><span className="font-bold text-[#7A6E60]">Provincia:</span> {selectedOrder.shippingAddress.province}</p>
+                      <p><span className="font-bold text-[#7A6E60]">C.P.:</span> {selectedOrder.shippingAddress.zip}</p>
+                      <p><span className="font-bold text-[#7A6E60]">Teléfono:</span> {selectedOrder.shippingAddress.phone}</p>
                     </>
                   ) : (
-                    <p className="text-[#8d6e63] italic">Sin dirección de envío (posiblemente un curso o compra digital)</p>
+                    <p className="text-[#7A6E60] italic">Sin dirección de envío (posiblemente un taller o compra digital)</p>
                   )}
                 </div>
               </div>
 
               {/* Items */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-[#8d6e63] uppercase tracking-wider">Productos</h4>
-                <div className="divide-y divide-[#f7f2ee] bg-white border border-[#e7ddd7] rounded-2xl p-3 max-h-48 overflow-y-auto">
+                <h4 className="text-xs font-bold text-[#7A6E60] uppercase tracking-wider">Productos</h4>
+                <div className="divide-y divide-[#FAF8F4] bg-[#FAF8F4] border border-[#E8E2D9] rounded-2xl p-3 max-h-48 overflow-y-auto">
                   {selectedOrder.items.map(item => (
                     <div key={item.productId} className="flex gap-3 py-2.5 items-center">
                       <img src={item.image} alt={item.name} className="w-10 h-10 object-cover rounded-lg" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-[#3e2723] truncate">{item.name}</p>
-                        <p className="text-[10px] text-[#8d6e63]">{item.quantity} x ${item.unitPrice.toLocaleString('es-AR')}</p>
+                        <p className="text-xs font-bold text-[#1A1A1A] truncate">{item.name}</p>
+                        <p className="text-[10px] text-[#7A6E60]">{item.quantity} x ${item.unitPrice.toLocaleString('es-AR')}</p>
                       </div>
-                      <span className="text-xs font-bold text-[#3e2723]">${(item.quantity * item.unitPrice).toLocaleString('es-AR')}</span>
+                      <span className="text-xs font-bold text-[#1A1A1A]">${(item.quantity * item.unitPrice).toLocaleString('es-AR')}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Totales */}
-              <div className="space-y-1.5 pt-4 border-t border-[#e7ddd7] text-xs">
-                <div className="flex justify-between text-[#8d6e63]">
+              <div className="space-y-1.5 pt-4 border-t border-[#E8E2D9] text-xs">
+                <div className="flex justify-between text-[#7A6E60]">
                   <span>Subtotal</span>
                   <span>${selectedOrder.subtotal.toLocaleString('es-AR')}</span>
                 </div>
@@ -398,11 +425,11 @@ export default function AdminOrdersPage() {
                     <span>-${selectedOrder.couponDiscount.toLocaleString('es-AR')}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-[#8d6e63]">
+                <div className="flex justify-between text-[#7A6E60]">
                   <span>Costo de Envío</span>
                   <span>{selectedOrder.shippingCost === 0 ? 'Gratis' : `$${selectedOrder.shippingCost.toLocaleString('es-AR')}`}</span>
                 </div>
-                <div className="flex justify-between text-sm font-black text-[#3e2723] pt-1">
+                <div className="flex justify-between text-sm font-black text-[#1A1A1A] pt-1">
                   <span>Total</span>
                   <span>${selectedOrder.total.toLocaleString('es-AR')}</span>
                 </div>

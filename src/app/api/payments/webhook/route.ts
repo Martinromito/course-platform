@@ -1,12 +1,13 @@
 // src/app/api/payments/webhook/route.ts
-// Webhook de Mercado Pago: valida y procesa notificaciones de pago
+// Webhook de Mercado Pago: valida y procesa notificaciones de pago públicas sin auth de usuario
 
 import { NextRequest, NextResponse } from 'next/server';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
-import { getProducts, saveProducts, getCoupons, saveCoupons, getOrders, saveOrders, getUsers, saveUsers } from '@/lib/data';
+import { getProducts, saveProducts, getCoupons, saveCoupons, getOrders, saveOrders, generateAccessToken } from '@/lib/data';
+import { sendOrderConfirmationEmail, sendWorkshopAccessEmail } from '@/lib/email/mailer';
 
 const client = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN!,
+  accessToken: process.env.MP_ACCESS_TOKEN || '',
 });
 
 export async function POST(req: NextRequest) {
@@ -50,28 +51,33 @@ export async function POST(req: NextRequest) {
     if (status === 'approved') {
       order.status = 'approved';
 
-      // 1. Actualizar isPaid del User en JSON
-      try {
-        const users = await getUsers();
-        const userIndex = users.findIndex(u => u._id === order.userId);
-        if (userIndex !== -1 && !users[userIndex].isPaid) {
-          users[userIndex].isPaid = true;
-          await saveUsers(users);
+      // 1. Generar tokens de acceso único para talleres online si aplica
+      const accessTokens: { workshopId: string; token: string }[] = [];
+      for (const item of order.items) {
+        if (item.itemType === 'workshop') {
+          accessTokens.push({
+            workshopId: item.productId,
+            token: generateAccessToken(),
+          });
         }
-      } catch (err) {
-        console.error('[WEBHOOK] Error actualizando usuario:', err);
       }
 
-      // 2. Descontar stock de productos (JSON)
+      if (accessTokens.length > 0) {
+        order.accessTokens = accessTokens;
+      }
+
+      // 2. Descontar stock de productos físicos
       try {
         const products = await getProducts();
         let changed = false;
         
         for (const item of order.items) {
-          const prodIndex = products.findIndex(p => p.id === item.productId);
-          if (prodIndex !== -1) {
-            products[prodIndex].stock = Math.max(0, products[prodIndex].stock - item.quantity);
-            changed = true;
+          if (item.itemType === 'product') {
+            const prodIndex = products.findIndex(p => p.id === item.productId);
+            if (prodIndex !== -1) {
+              products[prodIndex].stock = Math.max(0, products[prodIndex].stock - item.quantity);
+              changed = true;
+            }
           }
         }
         
@@ -96,13 +102,26 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      // 4. Guardar orden antes de enviar correos
+      await saveOrders(orders);
+
+      // 5. Enviar notificaciones de acceso por email
+      try {
+        await sendOrderConfirmationEmail(order);
+        if (accessTokens.length > 0) {
+          await sendWorkshopAccessEmail(order);
+        }
+      } catch (err) {
+        console.error('[WEBHOOK] Error al enviar correos:', err);
+      }
+
       console.log(`[WEBHOOK] Pedido ${orderId} aprobado`);
     } else if (status === 'rejected' || status === 'refunded') {
       order.status = status as 'rejected' | 'refunded';
+      await saveOrders(orders);
+    } else {
+      await saveOrders(orders);
     }
-
-    // Guardar los cambios en el pedido
-    await saveOrders(orders);
 
     return NextResponse.json({ message: 'Webhook procesado.' }, { status: 200 });
   } catch (error) {

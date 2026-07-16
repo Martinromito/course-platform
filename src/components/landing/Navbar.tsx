@@ -1,33 +1,40 @@
 // src/components/landing/Navbar.tsx
-// Navbar ecommerce con buscar, login y carrito — Estilo minimalista artesanal
+// Navbar ecommerce con login admin simple y carrito — Estilo minimalista artesanal
 
 'use client';
 
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useState, useEffect } from 'react';
-import { Search, ShoppingBag, User, Menu, X, ChevronDown } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, Settings } from 'lucide-react';
 
 const navLinks = [
   { href: '/', label: 'Inicio' },
   { href: '/productos', label: 'Productos' },
-  { href: '/cursos', label: 'Cursos' },
-  { href: '/nosotros', label: 'Nosotros' },
-  { href: '/contacto', label: 'Contacto' },
+  { href: '/talleres', label: 'Talleres Online' },
+  { href: '/talleres/mis-talleres', label: 'Mis Talleres' },
 ];
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
   const { totalItems, openCart } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [settings, setSettings] = useState<any>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings) setSettings(data.settings);
+      })
+      .catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -57,18 +64,16 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 group">
               <div className="relative w-9 h-9 lg:w-10 lg:h-10">
-                <img
-                  src="/logo.png"
-                  alt="La Mackenna"
-                  className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                />
+                <div className="w-full h-full rounded-full bg-[#8B7355] flex items-center justify-center text-white font-serif font-bold text-lg">
+                  {settings?.shopName ? settings.shopName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : 'LM'}
+                </div>
               </div>
               <div className="flex flex-col">
                 <span className="text-[#1A1A1A] font-semibold text-base lg:text-lg leading-none tracking-tight">
-                  La Mackenna
+                  {settings?.shopName || 'La Mackenna'}
                 </span>
                 <span className="text-[#8B7355] text-[9px] lg:text-[10px] font-medium tracking-[0.15em] uppercase mt-0.5">
-                  Productos Artesanales
+                  Productos & Talleres
                 </span>
               </div>
             </Link>
@@ -98,46 +103,15 @@ export default function Navbar() {
                 <Search className="w-[18px] h-[18px]" />
               </button>
 
-              {/* Auth */}
-              {user ? (
-                <div className="flex items-center gap-1">
-                  {user.role === 'admin' && (
-                    <Link
-                      href="/admin"
-                      className="px-3 py-2 text-[13px] font-medium text-[#4A4A4A] hover:text-[#8B7355] hover:bg-[#8B7355]/5 rounded-lg transition-all"
-                    >
-                      Admin
-                    </Link>
-                  )}
-                  <Link
-                    href="/dashboard"
-                    className="px-3 py-2 text-[13px] font-medium text-[#4A4A4A] hover:text-[#8B7355] hover:bg-[#8B7355]/5 rounded-lg transition-all"
-                  >
-                    Mi cuenta
-                  </Link>
-                  <Link
-                    href="/mis-pedidos"
-                    className="px-3 py-2 text-[13px] font-medium text-[#4A4A4A] hover:text-[#8B7355] hover:bg-[#8B7355]/5 rounded-lg transition-all"
-                  >
-                    Mis pedidos
-                  </Link>
-                  <button
-                    onClick={logout}
-                    className="px-3 py-2 text-[13px] font-medium text-[#7A6E60] hover:text-[#8B7355] hover:bg-[#8B7355]/5 rounded-lg transition-all"
-                  >
-                    Salir
-                  </button>
-                </div>
-              ) : (
-                <Link
-                  href="/login"
-                  className="p-2.5 rounded-lg text-[#4A4A4A] hover:text-[#8B7355] hover:bg-[#8B7355]/5 transition-all"
-                  aria-label="Iniciar sesión"
-                  id="btn-login"
-                >
-                  <User className="w-[18px] h-[18px]" />
-                </Link>
-              )}
+              {/* Admin Panel Link */}
+              <Link
+                href="/admin"
+                className="p-2.5 rounded-lg text-[#4A4A4A] hover:text-[#8B7355] hover:bg-[#8B7355]/5 transition-all"
+                aria-label="Administración"
+                id="btn-admin"
+              >
+                <Settings className="w-[18px] h-[18px]" />
+              </Link>
 
               {/* Cart */}
               <button
@@ -191,7 +165,7 @@ export default function Navbar() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7A6E60]" />
               <input
                 type="text"
-                placeholder="Buscar productos, cursos, herramientas..."
+                placeholder="Buscar productos, talleres, herramientas..."
                 className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#E8E2D9] bg-white text-[#1A1A1A] placeholder-[#7A6E60] text-sm focus:border-[#8B7355] focus:outline-none focus:ring-2 focus:ring-[#8B7355]/10 transition-all"
                 id="search-input"
               />
@@ -232,18 +206,6 @@ export default function Navbar() {
               </button>
             </div>
 
-            {/* Search */}
-            <div className="px-4 py-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7A6E60]" />
-                <input
-                  type="text"
-                  placeholder="Buscar..."
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[#E8E2D9] bg-white text-sm placeholder-[#7A6E60] focus:border-[#8B7355] focus:outline-none transition-all"
-                />
-              </div>
-            </div>
-
             {/* Nav Links */}
             <div className="flex-1 overflow-y-auto px-2 py-2">
               {navLinks.map((link) => (
@@ -258,61 +220,15 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* Auth Section */}
+            {/* Actions Section */}
             <div className="border-t border-[#E8E2D9] p-4 space-y-2">
-              {user ? (
-                <>
-                  <p className="text-xs text-[#7A6E60] font-medium px-2 mb-2">
-                    Hola, {user.name}
-                  </p>
-                  {user.role === 'admin' && (
-                    <Link
-                      href="/admin"
-                      onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-2 px-4 py-3 rounded-lg text-[#4A4A4A] hover:bg-[#F2F0ED] transition-colors font-medium text-sm"
-                    >
-                      Panel Admin
-                    </Link>
-                  )}
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-[#8B7355] text-white font-medium text-sm hover:bg-[#705E45] transition-colors"
-                  >
-                    Mi cuenta
-                  </Link>
-                  <Link
-                    href="/mis-pedidos"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-[#E8E2D9] text-[#4A4A4A] font-medium text-sm hover:bg-[#F2F0ED] transition-colors"
-                  >
-                    Mis pedidos
-                  </Link>
-                  <button
-                    onClick={() => { logout(); setMenuOpen(false); }}
-                    className="w-full px-4 py-3 rounded-lg text-[#7A6E60] hover:bg-[#F2F0ED] transition-colors font-medium text-sm text-center"
-                  >
-                    Cerrar sesión
-                  </button>
-                </>
-              ) : (
-                <div className="flex gap-2">
-                  <Link
-                    href="/login"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex-1 px-4 py-3 rounded-lg border border-[#E8E2D9] text-[#4A4A4A] font-medium text-sm text-center hover:bg-[#F2F0ED] transition-colors"
-                  >
-                    Ingresar
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex-1 px-4 py-3 rounded-lg bg-[#8B7355] text-white font-medium text-sm text-center hover:bg-[#705E45] transition-colors"
-                  >
-                    Crear cuenta
-                  </Link>
-                </div>
-              )}
+              <Link
+                href="/admin"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-[#E8E2D9] text-[#4A4A4A] font-medium text-sm hover:bg-[#F2F0ED] transition-colors"
+              >
+                Panel Administrador
+              </Link>
             </div>
           </div>
         </div>

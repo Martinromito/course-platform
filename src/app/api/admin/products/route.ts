@@ -2,11 +2,11 @@
 // Admin CRUD de productos — lee/escribe al JSON local
 
 import { NextRequest, NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth/middleware';
+import { withAdminAuth } from '@/lib/admin-auth';
 import { getProducts, saveProducts, type Product } from '@/lib/data';
 
 // GET — Lista todos los productos (incluidos inactivos)
-export const GET = withAdmin(async () => {
+export const GET = withAdminAuth(async () => {
   try {
     const products = await getProducts();
     return NextResponse.json({ products });
@@ -17,10 +17,10 @@ export const GET = withAdmin(async () => {
 });
 
 // POST — Crear nuevo producto
-export const POST = withAdmin(async (req: NextRequest) => {
+export const POST = withAdminAuth(async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { name, price, originalPrice, image, badge, category, stock } = body;
+    const { name, description, price, originalPrice, image, badge, category, stock } = body;
 
     if (!name || !price || !category) {
       return NextResponse.json(
@@ -34,12 +34,13 @@ export const POST = withAdmin(async (req: NextRequest) => {
     const newProduct: Product = {
       id: `prod-${Date.now()}`,
       name,
+      description: description || '',
       price: Number(price),
       originalPrice: originalPrice ? Number(originalPrice) : null,
       image: image || '/images/product-pieza.png',
       badge: badge || null,
       category,
-      stock: stock ? Number(stock) : 999,
+      stock: stock !== undefined ? Number(stock) : 999,
       isActive: true,
     };
 

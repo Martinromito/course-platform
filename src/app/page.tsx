@@ -1,11 +1,11 @@
 // src/app/page.tsx
-// Landing Page Principal — Rediseño ecommerce + cursos
+// Landing Page Principal — Rediseño ecommerce + talleres online
 
 import Navbar from '@/components/landing/Navbar';
 import HeroSection from '@/components/landing/HeroSection';
 import FeaturedProducts from '@/components/landing/FeaturedProducts';
 import Categories from '@/components/landing/Categories';
-import FeaturedCourses from '@/components/landing/FeaturedCourses';
+import FeaturedWorkshops from '@/components/landing/FeaturedWorkshops';
 import Footer from '@/components/landing/Footer';
 
 export default function LandingPage() {
@@ -23,12 +23,11 @@ export default function LandingPage() {
       {/* Categories */}
       <Categories />
 
-      {/* Featured Courses */}
-      <FeaturedCourses />
+      {/* Featured Workshops */}
+      <FeaturedWorkshops />
 
       {/* Footer */}
       <Footer />
     </main>
   );
 }
-

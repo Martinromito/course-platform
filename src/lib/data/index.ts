@@ -1,15 +1,17 @@
 // src/lib/data/index.ts
-// Helpers para leer/escribir los archivos JSON de productos, cupones, usuarios y pedidos
+// Helpers para leer/escribir los archivos JSON de productos, talleres, cupones y pedidos
 // Actúa como mini-DB local sin dependencias externas
 
 import { promises as fs } from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface Product {
   id: string;
   name: string;
+  description: string;
   price: number;
   originalPrice: number | null;
   image: string;
@@ -17,6 +19,19 @@ export interface Product {
   category: string;
   stock: number;
   isActive: boolean;
+}
+
+export interface Workshop {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  originalPrice: number | null;
+  image: string;
+  youtubeId: string;
+  badge: string | null;
+  isActive: boolean;
+  createdAt: string;
 }
 
 export interface Coupon {
@@ -31,15 +46,19 @@ export interface Coupon {
   expiresAt: string | null;
 }
 
-export interface User {
-  _id: string;
-  name: string;
-  email: string;
-  password?: string;
-  role: 'student' | 'admin';
-  isPaid: boolean;
-  completedLessons: string[];
-  createdAt: string;
+export interface Settings {
+  shopName: string;
+  shopTitle: string;
+  shopSubtitle: string;
+  shopImage: string;
+  shopLogo: string;
+  statsProducts: string;
+  statsWorkshops: string;
+  statsAlumnas: string;
+  bankAlias: string;
+  bankCbu: string;
+  bankName: string;
+  bankOwner: string;
 }
 
 export interface OrderItem {
@@ -48,6 +67,7 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number;
   image: string;
+  itemType: 'product' | 'workshop';
 }
 
 export interface ShippingAddress {
@@ -61,17 +81,21 @@ export interface ShippingAddress {
 
 export interface Order {
   _id: string;
-  userId: string;
+  buyerName: string;
+  buyerEmail: string;
+  buyerPhone: string;
   items: OrderItem[];
   subtotal: number;
   couponCode?: string;
   couponDiscount: number;
   shippingCost: number;
   total: number;
-  status: 'pending' | 'approved' | 'rejected' | 'refunded';
+  status: 'pending' | 'pending_transfer' | 'approved' | 'rejected' | 'refunded';
+  paymentMethod: 'mercadopago' | 'transfer';
   mpPaymentId?: string;
   mpPreferenceId?: string;
   shippingAddress?: ShippingAddress;
+  accessTokens?: { workshopId: string; token: string }[];
   createdAt: string;
   updatedAt: string;
 }
@@ -80,9 +104,11 @@ export interface Order {
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
+const WORKSHOPS_FILE = path.join(DATA_DIR, 'workshops.json');
 const COUPONS_FILE = path.join(DATA_DIR, 'coupons.json');
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
+const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
+const LOGIN_CODES_FILE = path.join(DATA_DIR, 'login_codes.json');
 
 // ─── Generic read/write ──────────────────────────────────────────────────────
 
@@ -118,6 +144,26 @@ export async function getProductById(id: string): Promise<Product | undefined> {
 
 export async function saveProducts(products: Product[]): Promise<void> {
   return writeJSON(PRODUCTS_FILE, products);
+}
+
+// ─── Workshops ───────────────────────────────────────────────────────────────
+
+export async function getWorkshops(): Promise<Workshop[]> {
+  return readJSON<Workshop>(WORKSHOPS_FILE);
+}
+
+export async function getActiveWorkshops(): Promise<Workshop[]> {
+  const workshops = await getWorkshops();
+  return workshops.filter((w) => w.isActive);
+}
+
+export async function getWorkshopById(id: string): Promise<Workshop | undefined> {
+  const workshops = await getWorkshops();
+  return workshops.find((w) => w.id === id);
+}
+
+export async function saveWorkshops(workshops: Workshop[]): Promise<void> {
+  return writeJSON(WORKSHOPS_FILE, workshops);
 }
 
 // ─── Coupons ─────────────────────────────────────────────────────────────────
@@ -169,26 +215,6 @@ export async function validateCoupon(
   return { valid: true, discount, coupon };
 }
 
-// ─── Users ───────────────────────────────────────────────────────────────────
-
-export async function getUsers(): Promise<User[]> {
-  return readJSON<User>(USERS_FILE);
-}
-
-export async function saveUsers(users: User[]): Promise<void> {
-  return writeJSON(USERS_FILE, users);
-}
-
-export async function getUserByEmail(email: string): Promise<User | undefined> {
-  const users = await getUsers();
-  return users.find((u) => u.email.toLowerCase() === email.toLowerCase());
-}
-
-export async function getUserById(id: string): Promise<User | undefined> {
-  const users = await getUsers();
-  return users.find((u) => u._id === id);
-}
-
 // ─── Orders ──────────────────────────────────────────────────────────────────
 
 export async function getOrders(): Promise<Order[]> {
@@ -199,10 +225,65 @@ export async function saveOrders(orders: Order[]): Promise<void> {
   return writeJSON(ORDERS_FILE, orders);
 }
 
+// ─── Settings ────────────────────────────────────────────────────────────────
+
+export async function getSettings(): Promise<Settings> {
+  try {
+    const raw = await fs.readFile(SETTINGS_FILE, 'utf-8');
+    return JSON.parse(raw) as Settings;
+  } catch {
+    return {
+      shopName: "La Mackenna",
+      shopTitle: "Creá piezas únicas para tu hogar y tus proyectos creativos",
+      shopSubtitle: "Descubrí productos artesanales, insumos exclusivos y capacitaciones para aprender nuevas técnicas.",
+      shopImage: "/images/hero.png",
+      shopLogo: "/logo.png",
+      statsProducts: "200+",
+      statsWorkshops: "10+",
+      statsAlumnas: "1.500+",
+      bankAlias: "lamackenna.arte",
+      bankCbu: "0070000000000000000000",
+      bankName: "Galicia",
+      bankOwner: "La Mackenna"
+    };
+  }
+}
+
+export async function saveSettings(settings: Settings): Promise<void> {
+  await fs.mkdir(path.dirname(SETTINGS_FILE), { recursive: true });
+  await fs.writeFile(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf-8');
+}
+
+// ─── Login Codes ─────────────────────────────────────────────────────────────
+
+export interface LoginCode {
+  email: string;
+  code: string;
+  expiresAt: string;
+}
+
+export async function getLoginCodes(): Promise<LoginCode[]> {
+  return readJSON<LoginCode>(LOGIN_CODES_FILE);
+}
+
+export async function saveLoginCodes(codes: LoginCode[]): Promise<void> {
+  return writeJSON(LOGIN_CODES_FILE, codes);
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 export function formatPrice(price: number): string {
   return `$${price.toLocaleString('es-AR')}`;
+}
+
+/** Genera un token único seguro para acceso a talleres */
+export function generateAccessToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+/** Genera un ID único para entidades */
+export function generateId(prefix: string): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
 
 // Configuración de envío
@@ -211,6 +292,7 @@ export const SHIPPING_CONFIG = {
   flatRate: 5000,       // Tarifa plana de envío
 };
 
-export function calculateShipping(subtotal: number): number {
+export function calculateShipping(subtotal: number, hasPhysicalProducts: boolean): number {
+  if (!hasPhysicalProducts) return 0; // Talleres digitales → sin envío
   return subtotal >= SHIPPING_CONFIG.freeThreshold ? 0 : SHIPPING_CONFIG.flatRate;
 }

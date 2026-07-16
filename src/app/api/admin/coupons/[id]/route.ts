@@ -2,13 +2,17 @@
 // Admin — Editar y eliminar cupón individual
 
 import { NextRequest, NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth/middleware';
+import { withAdminAuth } from '@/lib/admin-auth';
 import { getCoupons, saveCoupons } from '@/lib/data';
 
+interface Context {
+  params: Promise<{ id: string }>;
+}
+
 // PUT — Editar cupón
-export const PUT = withAdmin(async (req: NextRequest, _user, context) => {
+export const PUT = withAdminAuth(async (req: NextRequest, context?: any) => {
   try {
-    const { id } = await context!.params;
+    const { id } = await (context as Context).params;
     const body = await req.json();
     const coupons = await getCoupons();
     const index = coupons.findIndex((c) => c.id === id);
@@ -36,9 +40,9 @@ export const PUT = withAdmin(async (req: NextRequest, _user, context) => {
 });
 
 // DELETE — Eliminar cupón
-export const DELETE = withAdmin(async (_req: NextRequest, _user, context) => {
+export const DELETE = withAdminAuth(async (_req: NextRequest, context?: any) => {
   try {
-    const { id } = await context!.params;
+    const { id } = await (context as Context).params;
     const coupons = await getCoupons();
     const filtered = coupons.filter((c) => c.id !== id);
 

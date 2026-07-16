@@ -5,8 +5,20 @@
 
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
+import { useState, useEffect } from 'react';
 
 export default function HeroSection() {
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings) setSettings(data.settings);
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden pt-20 lg:pt-0">
       {/* Fondo sutil */}
@@ -22,18 +34,17 @@ export default function HeroSection() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#8B7355]/15 bg-[#8B7355]/[0.06] text-[#8B7355] text-xs font-medium mb-8 animate-fade-in">
               <span className="w-1.5 h-1.5 rounded-full bg-[#8B7355]" />
-              Tienda artesanal &amp; academia creativa
+              Tienda artesanal &amp; academia creativa de {settings?.shopName || 'La Mackenna'}
             </div>
 
             {/* Título */}
             <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl font-bold text-[#1A1A1A] leading-[1.1] mb-6 animate-fade-in-up">
-              Creá piezas únicas para tu hogar y tus{' '}
-              <span className="text-[#8B7355] italic">proyectos creativos</span>
+              {settings?.shopTitle || 'Creá piezas únicas para tu hogar y tus proyectos creativos'}
             </h1>
 
             {/* Subtítulo */}
             <p className="text-base sm:text-lg text-[#4A4A4A] max-w-lg lg:max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed animate-fade-in-up delay-100">
-              Descubrí productos artesanales, insumos exclusivos y capacitaciones para aprender nuevas técnicas.
+              {settings?.shopSubtitle || 'Descubrí productos artesanales, insumos exclusivos y capacitaciones para aprender nuevas técnicas.'}
             </p>
 
             {/* CTAs */}
@@ -43,9 +54,9 @@ export default function HeroSection() {
                   Ver productos
                 </Button>
               </Link>
-              <Link href="/cursos" className="w-full sm:w-auto">
+              <Link href="/talleres" className="w-full sm:w-auto">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                  Explorar cursos
+                  Explorar talleres
                 </Button>
               </Link>
             </div>
@@ -53,17 +64,17 @@ export default function HeroSection() {
             {/* Micro-stats */}
             <div className="flex items-center justify-center lg:justify-start gap-6 sm:gap-8 mt-10 animate-fade-in delay-300">
               <div className="text-center lg:text-left">
-                <p className="text-xl sm:text-2xl font-bold text-[#1A1A1A]">200+</p>
+                <p className="text-xl sm:text-2xl font-bold text-[#1A1A1A]">{settings?.statsProducts || '200+'}</p>
                 <p className="text-xs text-[#7A6E60] font-medium">Productos</p>
               </div>
               <div className="w-px h-8 bg-[#E8E2D9]" />
               <div className="text-center lg:text-left">
-                <p className="text-xl sm:text-2xl font-bold text-[#1A1A1A]">15+</p>
-                <p className="text-xs text-[#7A6E60] font-medium">Cursos</p>
+                <p className="text-xl sm:text-2xl font-bold text-[#1A1A1A]">{settings?.statsWorkshops || '10+'}</p>
+                <p className="text-xs text-[#7A6E60] font-medium">Talleres</p>
               </div>
               <div className="w-px h-8 bg-[#E8E2D9]" />
               <div className="text-center lg:text-left">
-                <p className="text-xl sm:text-2xl font-bold text-[#1A1A1A]">1.500+</p>
+                <p className="text-xl sm:text-2xl font-bold text-[#1A1A1A]">{settings?.statsAlumnas || '1.500+'}</p>
                 <p className="text-xs text-[#7A6E60] font-medium">Alumnas</p>
               </div>
             </div>
@@ -73,8 +84,8 @@ export default function HeroSection() {
           <div className="flex-1 relative animate-fade-in delay-200 w-full max-w-md lg:max-w-lg xl:max-w-xl">
             <div className="relative w-full aspect-[4/5] rounded-2xl lg:rounded-3xl overflow-hidden shadow-2xl shadow-[#8B7355]/10">
               <img
-                src="/images/hero.png"
-                alt="Productos artesanales La Mackenna — pinturas fluidas, kits y herramientas"
+                src={settings?.shopImage || '/images/hero.png'}
+                alt={`Productos artesanales ${settings?.shopName || 'La Mackenna'} — pinturas fluidas, kits y herramientas`}
                 className="w-full h-full object-cover"
               />
               {/* Gradient overlay suave */}

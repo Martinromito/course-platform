@@ -7,7 +7,7 @@
     "image": "/images/product-kit.png",
     "badge": "Más vendido",
     "category": "kits",
-    "stock": 50,
+    "stock": 46,
     "isActive": true
   },
   {
@@ -18,7 +18,7 @@
     "image": "/images/product-pinceles.png",
     "badge": null,
     "category": "herramientas",
-    "stock": 30,
+    "stock": 29,
     "isActive": true
   },
   {
@@ -29,7 +29,7 @@
     "image": "/images/product-paleta.png",
     "badge": "Nuevo",
     "category": "pinturas-fluidas",
-    "stock": 25,
+    "stock": 23,
     "isActive": true
   },
   {

@@ -1,10 +1,9 @@
 // src/app/layout.tsx
-// Layout raíz con providers globales — Rediseño ecommerce + cursos
+// Layout raíz — CartProvider global, sin auth de usuarios
 
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
-import { AuthProvider } from '@/contexts/AuthContext';
 import { CartProvider } from '@/contexts/CartContext';
 import CartDrawer from '@/components/cart/CartDrawer';
 import { Toaster } from 'react-hot-toast';
@@ -23,13 +22,13 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'La Mackenna — Productos Artesanales y Cursos Creativos',
+  title: 'La Mackenna — Productos Artesanales y Talleres Online',
   description:
-    'Descubrí productos artesanales, insumos exclusivos y capacitaciones para aprender nuevas técnicas. Pinturas fluidas, kits, herramientas y más.',
-  keywords: 'productos artesanales, pinturas fluidas, cursos creativos, kits artesanales, herramientas, La Mackenna',
+    'Descubrí productos artesanales, insumos exclusivos y talleres online para aprender nuevas técnicas. Pinturas fluidas, kits, herramientas y más.',
+  keywords: 'productos artesanales, pinturas fluidas, talleres online, kits artesanales, herramientas, La Mackenna',
   openGraph: {
-    title: 'La Mackenna — Productos Artesanales y Cursos Creativos',
-    description: 'Tu tienda de productos artesanales y academia de técnicas creativas.',
+    title: 'La Mackenna — Productos Artesanales y Talleres Online',
+    description: 'Tu tienda de productos artesanales y talleres creativos online.',
     type: 'website',
   },
 };
@@ -42,25 +41,23 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <body className="bg-[#FAF8F4] text-[#1A1A1A] antialiased">
-        <AuthProvider>
-          <CartProvider>
-            {children}
-            <CartDrawer />
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                style: {
-                  background: '#FFFDF9',
-                  color: '#1A1A1A',
-                  border: '1px solid #E8E2D9',
-                  borderRadius: '12px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                },
-              }}
-            />
-          </CartProvider>
-        </AuthProvider>
+        <CartProvider>
+          {children}
+          <CartDrawer />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: '#FFFDF9',
+                color: '#1A1A1A',
+                border: '1px solid #E8E2D9',
+                borderRadius: '12px',
+                fontSize: '14px',
+                fontWeight: '500',
+              },
+            }}
+          />
+        </CartProvider>
       </body>
     </html>
   );

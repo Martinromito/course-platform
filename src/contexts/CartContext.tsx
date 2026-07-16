@@ -13,6 +13,7 @@ export interface CartProduct {
   price: number;
   originalPrice: number | null;
   image: string;
+  itemType?: 'product' | 'workshop';
 }
 
 export interface CartItem {
@@ -158,9 +159,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const shippingCost = useMemo(() => {
     if (items.length === 0) return 0;
+    const hasPhysicalProducts = items.some(item => item.product.itemType !== 'workshop');
+    if (!hasPhysicalProducts) return 0;
     const afterDiscount = subtotal - discount;
     return afterDiscount >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT_RATE;
-  }, [subtotal, discount, items.length]);
+  }, [subtotal, discount, items]);
 
   const total = useMemo(() => {
     return Math.max(0, subtotal - discount + shippingCost);

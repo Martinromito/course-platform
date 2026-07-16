@@ -4,13 +4,23 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MessageCircle, Send } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings) setSettings(data.settings);
+      })
+      .catch(console.error);
+  }, []);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,13 +40,13 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-2.5 group">
               <div className="relative w-8 h-8">
                 <img
-                  src="/logo.png"
-                  alt="La Mackenna"
+                  src={settings?.shopLogo || "/logo.png"}
+                  alt={settings?.shopName || "La Mackenna"}
                   className="w-full h-full object-contain"
                 />
               </div>
               <span className="text-[#1A1A1A] font-semibold text-lg tracking-tight">
-                La Mackenna
+                {settings?.shopName || "La Mackenna"}
               </span>
             </Link>
             <p className="text-[#4A4A4A] text-sm leading-relaxed max-w-sm">
@@ -165,7 +175,7 @@ export default function Footer() {
         {/* Separador y Footer Bottom */}
         <div className="border-t border-[#E8E2D9] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-[#7A6E60] text-xs text-center sm:text-left">
-            © {new Date().getFullYear()} La Mackenna. Todos los derechos reservados.
+            © {new Date().getFullYear()} {settings?.shopName || 'La Mackenna'}. Todos los derechos reservados.
           </p>
           <div className="flex items-center gap-6 text-xs text-[#7A6E60]">
             <Link href="/terminos" className="hover:text-[#8B7355] transition-colors">

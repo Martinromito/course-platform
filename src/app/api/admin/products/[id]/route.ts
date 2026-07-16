@@ -2,13 +2,17 @@
 // Admin — Editar y eliminar un producto individual
 
 import { NextRequest, NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth/middleware';
+import { withAdminAuth } from '@/lib/admin-auth';
 import { getProducts, saveProducts } from '@/lib/data';
 
+interface Context {
+  params: Promise<{ id: string }>;
+}
+
 // PUT — Editar producto
-export const PUT = withAdmin(async (req: NextRequest, _user, context) => {
+export const PUT = withAdminAuth(async (req: NextRequest, context?: any) => {
   try {
-    const { id } = await context!.params;
+    const { id } = await (context as Context).params;
     const body = await req.json();
     const products = await getProducts();
     const index = products.findIndex((p) => p.id === id);
@@ -21,7 +25,7 @@ export const PUT = withAdmin(async (req: NextRequest, _user, context) => {
       ...products[index],
       ...body,
       id, // No permitir cambiar el ID
-      price: body.price ? Number(body.price) : products[index].price,
+      price: body.price !== undefined ? Number(body.price) : products[index].price,
       originalPrice: body.originalPrice !== undefined
         ? (body.originalPrice ? Number(body.originalPrice) : null)
         : products[index].originalPrice,
@@ -37,9 +41,9 @@ export const PUT = withAdmin(async (req: NextRequest, _user, context) => {
 });
 
 // DELETE — Eliminar producto
-export const DELETE = withAdmin(async (_req: NextRequest, _user, context) => {
+export const DELETE = withAdminAuth(async (req: NextRequest, context?: any) => {
   try {
-    const { id } = await context!.params;
+    const { id } = await (context as Context).params;
     const products = await getProducts();
     const filtered = products.filter((p) => p.id !== id);
 

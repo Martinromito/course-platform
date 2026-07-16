@@ -1,0 +1,38 @@
+[
+  {
+    "id": "ws-1",
+    "title": "Pintura Fluida: De cero a experto",
+    "description": "Dominá las técnicas de fluid art, acrílico pouring y efectos marmolados para crear piezas únicas.",
+    "price": 24000,
+    "originalPrice": 29000,
+    "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&q=80&w=600",
+    "youtubeId": "dQw4w9WgXcQ",
+    "badge": "Popular",
+    "isActive": true,
+    "createdAt": "2026-07-16T12:00:00.000Z"
+  },
+  {
+    "id": "ws-2",
+    "title": "Cestería y Textiles Artesanales",
+    "description": "Aprendé a crear cestos, servilleteros y objetos textiles con técnicas ancestrales y modernas.",
+    "price": 18000,
+    "originalPrice": null,
+    "image": "https://images.unsplash.com/photo-1590736704728-f4730bb30770?auto=format&fit=crop&q=80&w=600",
+    "youtubeId": "dQw4w9WgXcQ",
+    "badge": null,
+    "isActive": true,
+    "createdAt": "2026-07-16T12:01:00.000Z"
+  },
+  {
+    "id": "ws-3",
+    "title": "Emprendimiento Creativo",
+    "description": "Transformá tu pasión en un negocio: packaging, fotografía, pricing y venta en redes sociales.",
+    "price": 19500,
+    "originalPrice": 22000,
+    "image": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=600",
+    "youtubeId": "dQw4w9WgXcQ",
+    "badge": "Recomendado",
+    "isActive": true,
+    "createdAt": "2026-07-16T12:02:00.000Z"
+  }
+]

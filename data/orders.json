@@ -26,5 +26,538 @@
     },
     "createdAt": "2026-06-05T18:03:20.517Z",
     "updatedAt": "2026-06-05T18:03:20.517Z"
+  },
+  {
+    "_id": "ord-1780688243626-sohpdiy",
+    "userId": "user-1780688205028-8gpgk57",
+    "items": [
+      {
+        "productId": "prod-1",
+        "name": "Kit Paleta Completa",
+        "quantity": 3,
+        "unitPrice": 60030,
+        "image": "/images/product-kit.png"
+      },
+      {
+        "productId": "prod-2",
+        "name": "Set de Pinceles Premium",
+        "quantity": 1,
+        "unitPrice": 24500,
+        "image": "/images/product-pinceles.png"
+      }
+    ],
+    "subtotal": 204590,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 204590,
+    "status": "pending",
+    "shippingAddress": {
+      "name": "martin",
+      "phone": "02323543638",
+      "address": "25 de Mayo 1453",
+      "city": "LUJAN - LUJAN",
+      "province": "Buenos Aires",
+      "zip": "6700"
+    },
+    "createdAt": "2026-06-05T19:37:23.626Z",
+    "updatedAt": "2026-06-05T19:37:23.626Z"
+  },
+  {
+    "_id": "ord-1784214975425-ggsdt6u",
+    "buyerName": "martin",
+    "buyerEmail": "mromito5@gmail.com",
+    "buyerPhone": "02323543638",
+    "items": [
+      {
+        "productId": "prod-1",
+        "name": "Kit Paleta Completa",
+        "quantity": 3,
+        "unitPrice": 60030,
+        "image": "/images/product-kit.png",
+        "itemType": "product"
+      },
+      {
+        "productId": "prod-2",
+        "name": "Set de Pinceles Premium",
+        "quantity": 1,
+        "unitPrice": 24500,
+        "image": "/images/product-pinceles.png",
+        "itemType": "product"
+      },
+      {
+        "productId": "ws-1",
+        "name": "Pintura Fluida: De cero a experto",
+        "quantity": 1,
+        "unitPrice": 24000,
+        "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&q=80&w=600",
+        "itemType": "workshop"
+      }
+    ],
+    "subtotal": 228590,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 228590,
+    "status": "pending",
+    "paymentMethod": "mercadopago",
+    "shippingAddress": {
+      "name": "martin",
+      "phone": "02323543638",
+      "address": "25 de Mayo 1453",
+      "city": "LUJAN - LUJAN",
+      "province": "Buenos Aires",
+      "zip": "6700"
+    },
+    "createdAt": "2026-07-16T15:16:15.425Z",
+    "updatedAt": "2026-07-16T15:16:15.425Z"
+  },
+  {
+    "_id": "ord-1784215736132-5iyqn43",
+    "buyerName": "martin",
+    "buyerEmail": "mromito5@gmail.com",
+    "buyerPhone": "02323543638",
+    "items": [
+      {
+        "productId": "prod-1",
+        "name": "Kit Paleta Completa",
+        "quantity": 3,
+        "unitPrice": 60030,
+        "image": "/images/product-kit.png",
+        "itemType": "product"
+      },
+      {
+        "productId": "prod-2",
+        "name": "Set de Pinceles Premium",
+        "quantity": 1,
+        "unitPrice": 24500,
+        "image": "/images/product-pinceles.png",
+        "itemType": "product"
+      },
+      {
+        "productId": "ws-1",
+        "name": "Pintura Fluida: De cero a experto",
+        "quantity": 1,
+        "unitPrice": 24000,
+        "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&q=80&w=600",
+        "itemType": "workshop"
+      }
+    ],
+    "subtotal": 228590,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 228590,
+    "status": "pending",
+    "paymentMethod": "mercadopago",
+    "shippingAddress": {
+      "name": "martin",
+      "phone": "02323543638",
+      "address": "25 de Mayo 1453",
+      "city": "LUJAN - LUJAN",
+      "province": "Buenos Aires",
+      "zip": "6700"
+    },
+    "createdAt": "2026-07-16T15:28:56.132Z",
+    "updatedAt": "2026-07-16T15:28:56.132Z"
+  },
+  {
+    "_id": "ord-1784215741746-qr96svc",
+    "buyerName": "martin",
+    "buyerEmail": "mromito5@gmail.com",
+    "buyerPhone": "02323543638",
+    "items": [
+      {
+        "productId": "prod-1",
+        "name": "Kit Paleta Completa",
+        "quantity": 3,
+        "unitPrice": 60030,
+        "image": "/images/product-kit.png",
+        "itemType": "product"
+      },
+      {
+        "productId": "prod-2",
+        "name": "Set de Pinceles Premium",
+        "quantity": 1,
+        "unitPrice": 24500,
+        "image": "/images/product-pinceles.png",
+        "itemType": "product"
+      },
+      {
+        "productId": "ws-1",
+        "name": "Pintura Fluida: De cero a experto",
+        "quantity": 1,
+        "unitPrice": 24000,
+        "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&q=80&w=600",
+        "itemType": "workshop"
+      }
+    ],
+    "subtotal": 228590,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 228590,
+    "status": "pending",
+    "paymentMethod": "mercadopago",
+    "shippingAddress": {
+      "name": "martin",
+      "phone": "02323543638",
+      "address": "25 de Mayo 1453",
+      "city": "LUJAN - LUJAN",
+      "province": "Buenos Aires",
+      "zip": "6700"
+    },
+    "createdAt": "2026-07-16T15:29:01.746Z",
+    "updatedAt": "2026-07-16T15:29:01.746Z"
+  },
+  {
+    "_id": "ord-1784216242169-javaitk",
+    "buyerName": "Test",
+    "buyerEmail": "test@example.com",
+    "buyerPhone": "1122334455",
+    "items": [
+      {
+        "productId": "prod-1",
+        "name": "Kit Paleta Completa",
+        "quantity": 1,
+        "unitPrice": 60030,
+        "image": "/images/product-kit.png",
+        "itemType": "product"
+      }
+    ],
+    "subtotal": 60030,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 60030,
+    "status": "pending",
+    "paymentMethod": "mercadopago",
+    "shippingAddress": {
+      "name": "Test",
+      "phone": "1122334455",
+      "address": "Calle Falsa 123",
+      "city": "CABA",
+      "province": "Buenos Aires",
+      "zip": "1234"
+    },
+    "createdAt": "2026-07-16T15:37:22.169Z",
+    "updatedAt": "2026-07-16T15:37:22.169Z"
+  },
+  {
+    "_id": "ord-1784216404475-8qn7xkr",
+    "buyerName": "Test",
+    "buyerEmail": "test@example.com",
+    "buyerPhone": "1122334455",
+    "items": [
+      {
+        "productId": "prod-1",
+        "name": "Kit Paleta Completa",
+        "quantity": 1,
+        "unitPrice": 60030,
+        "image": "/images/product-kit.png",
+        "itemType": "product"
+      }
+    ],
+    "subtotal": 60030,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 60030,
+    "status": "pending",
+    "paymentMethod": "mercadopago",
+    "shippingAddress": {
+      "name": "Test",
+      "phone": "1122334455",
+      "address": "Calle Falsa 123",
+      "city": "CABA",
+      "province": "Buenos Aires",
+      "zip": "1234"
+    },
+    "createdAt": "2026-07-16T15:40:04.475Z",
+    "updatedAt": "2026-07-16T15:40:04.475Z"
+  },
+  {
+    "_id": "ord-1784217195271-wd6tz61",
+    "buyerName": "Test User",
+    "buyerEmail": "test@test.com",
+    "buyerPhone": "1122334455",
+    "items": [
+      {
+        "productId": "prod-1",
+        "name": "Kit Paleta Completa",
+        "quantity": 1,
+        "unitPrice": 60030,
+        "image": "/images/product-kit.png",
+        "itemType": "product"
+      }
+    ],
+    "subtotal": 60030,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 60030,
+    "status": "pending",
+    "paymentMethod": "mercadopago",
+    "shippingAddress": {
+      "name": "Test User",
+      "phone": "1122334455",
+      "address": "Calle Test 123",
+      "city": "CABA",
+      "province": "Buenos Aires",
+      "zip": "1000"
+    },
+    "createdAt": "2026-07-16T15:53:15.271Z",
+    "updatedAt": "2026-07-16T15:53:15.271Z"
+  },
+  {
+    "_id": "ord-1784217256399-4uau00z",
+    "buyerName": "Test",
+    "buyerEmail": "test@example.com",
+    "buyerPhone": "1122334455",
+    "items": [
+      {
+        "productId": "prod-1",
+        "name": "Kit Paleta Completa",
+        "quantity": 1,
+        "unitPrice": 60030,
+        "image": "/images/product-kit.png",
+        "itemType": "product"
+      }
+    ],
+    "subtotal": 60030,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 60030,
+    "status": "pending",
+    "paymentMethod": "mercadopago",
+    "shippingAddress": {
+      "name": "Test",
+      "phone": "1122334455",
+      "address": "Calle Falsa 123",
+      "city": "CABA",
+      "province": "Buenos Aires",
+      "zip": "1234"
+    },
+    "createdAt": "2026-07-16T15:54:16.399Z",
+    "updatedAt": "2026-07-16T15:54:16.399Z"
+  },
+  {
+    "_id": "ord-1784218227540-iar1644",
+    "buyerName": "martin",
+    "buyerEmail": "mromito5@gmail.com",
+    "buyerPhone": "02323543638",
+    "items": [
+      {
+        "productId": "prod-1",
+        "name": "Kit Paleta Completa",
+        "quantity": 4,
+        "unitPrice": 60030,
+        "image": "/images/product-kit.png",
+        "itemType": "product"
+      },
+      {
+        "productId": "prod-2",
+        "name": "Set de Pinceles Premium",
+        "quantity": 1,
+        "unitPrice": 24500,
+        "image": "/images/product-pinceles.png",
+        "itemType": "product"
+      },
+      {
+        "productId": "ws-1",
+        "name": "Pintura Fluida: De cero a experto",
+        "quantity": 1,
+        "unitPrice": 24000,
+        "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&q=80&w=600",
+        "itemType": "workshop"
+      }
+    ],
+    "subtotal": 288620,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 288620,
+    "status": "pending",
+    "paymentMethod": "mercadopago",
+    "shippingAddress": {
+      "name": "martin",
+      "phone": "02323543638",
+      "address": "25 de Mayo 1453",
+      "city": "LUJAN - LUJAN",
+      "province": "Buenos Aires",
+      "zip": "6700"
+    },
+    "createdAt": "2026-07-16T16:10:27.540Z",
+    "updatedAt": "2026-07-16T16:10:27.540Z"
+  },
+  {
+    "_id": "ord-1784221227344-n0uyh3b",
+    "buyerName": "martin",
+    "buyerEmail": "mromito5@gmail.com",
+    "buyerPhone": "02323543638",
+    "items": [
+      {
+        "productId": "prod-1",
+        "name": "Kit Paleta Completa",
+        "quantity": 4,
+        "unitPrice": 60030,
+        "image": "/images/product-kit.png",
+        "itemType": "product"
+      },
+      {
+        "productId": "prod-2",
+        "name": "Set de Pinceles Premium",
+        "quantity": 1,
+        "unitPrice": 24500,
+        "image": "/images/product-pinceles.png",
+        "itemType": "product"
+      },
+      {
+        "productId": "ws-1",
+        "name": "Pintura Fluida: De cero a experto",
+        "quantity": 1,
+        "unitPrice": 24000,
+        "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&q=80&w=600",
+        "itemType": "workshop"
+      }
+    ],
+    "subtotal": 288620,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 288620,
+    "status": "pending",
+    "paymentMethod": "mercadopago",
+    "shippingAddress": {
+      "name": "martin",
+      "phone": "02323543638",
+      "address": "25 de Mayo 1453",
+      "city": "LUJAN - LUJAN",
+      "province": "Buenos Aires",
+      "zip": "6700"
+    },
+    "createdAt": "2026-07-16T17:00:27.344Z",
+    "updatedAt": "2026-07-16T17:00:27.344Z"
+  },
+  {
+    "_id": "ord-1784223968151-ivcwh4k",
+    "buyerName": "martin",
+    "buyerEmail": "mromito5@gmail.com",
+    "buyerPhone": "02323543638",
+    "items": [
+      {
+        "productId": "prod-1",
+        "name": "Kit Paleta Completa",
+        "quantity": 4,
+        "unitPrice": 60030,
+        "image": "/images/product-kit.png",
+        "itemType": "product"
+      },
+      {
+        "productId": "prod-2",
+        "name": "Set de Pinceles Premium",
+        "quantity": 1,
+        "unitPrice": 24500,
+        "image": "/images/product-pinceles.png",
+        "itemType": "product"
+      },
+      {
+        "productId": "ws-1",
+        "name": "Pintura Fluida: De cero a experto",
+        "quantity": 1,
+        "unitPrice": 24000,
+        "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&q=80&w=600",
+        "itemType": "workshop"
+      },
+      {
+        "productId": "prod-3",
+        "name": "Paleta Celestes y Neutros",
+        "quantity": 1,
+        "unitPrice": 24000,
+        "image": "/images/product-paleta.png",
+        "itemType": "product"
+      }
+    ],
+    "subtotal": 312620,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 312620,
+    "status": "approved",
+    "paymentMethod": "mercadopago",
+    "shippingAddress": {
+      "name": "martin",
+      "phone": "02323543638",
+      "address": "25 de Mayo 1453",
+      "city": "LUJAN - LUJAN",
+      "province": "Buenos Aires",
+      "zip": "6700"
+    },
+    "createdAt": "2026-07-16T17:46:08.151Z",
+    "updatedAt": "2026-07-16T17:46:08.151Z",
+    "mpPaymentId": "mock-pay-1784223968154",
+    "mpPreferenceId": "mock-pref-1784223968153",
+    "accessTokens": [
+      {
+        "workshopId": "ws-1",
+        "token": "6dd94d05f00778870c940fe2b830933c1c79ae1e374405a9902a0ff1f0357ddf"
+      }
+    ]
+  },
+  {
+    "_id": "ord-1784224433598-npv8w84",
+    "buyerName": "martin",
+    "buyerEmail": "mromito5@yopmail.com",
+    "buyerPhone": "02323543638",
+    "items": [
+      {
+        "productId": "prod-3",
+        "name": "Paleta Celestes y Neutros",
+        "quantity": 1,
+        "unitPrice": 24000,
+        "image": "/images/product-paleta.png",
+        "itemType": "product"
+      }
+    ],
+    "subtotal": 24000,
+    "couponDiscount": 0,
+    "shippingCost": 5000,
+    "total": 29000,
+    "status": "approved",
+    "paymentMethod": "mercadopago",
+    "shippingAddress": {
+      "name": "martin",
+      "phone": "02323543638",
+      "address": "25 de Mayo 1453",
+      "city": "LUJAN - LUJAN",
+      "province": "Buenos Aires",
+      "zip": "6700"
+    },
+    "createdAt": "2026-07-16T17:53:53.598Z",
+    "updatedAt": "2026-07-16T17:53:53.598Z",
+    "mpPaymentId": "mock-pay-1784224433600",
+    "mpPreferenceId": "mock-pref-1784224433599"
+  },
+  {
+    "_id": "ord-1784224509243-h2d74k7",
+    "buyerName": "Martin Romito",
+    "buyerEmail": "mromito5@yopmail.com",
+    "buyerPhone": "02323543638",
+    "items": [
+      {
+        "productId": "ws-2",
+        "name": "Cestería y Textiles Artesanales",
+        "quantity": 1,
+        "unitPrice": 18000,
+        "image": "https://images.unsplash.com/photo-1590736704728-f4730bb30770?auto=format&fit=crop&q=80&w=600",
+        "itemType": "workshop"
+      }
+    ],
+    "subtotal": 18000,
+    "couponDiscount": 0,
+    "shippingCost": 0,
+    "total": 18000,
+    "status": "approved",
+    "paymentMethod": "mercadopago",
+    "createdAt": "2026-07-16T17:55:09.243Z",
+    "updatedAt": "2026-07-16T17:55:09.243Z",
+    "mpPaymentId": "mock-pay-1784224509246",
+    "mpPreferenceId": "mock-pref-1784224509244",
+    "accessTokens": [
+      {
+        "workshopId": "ws-2",
+        "token": "50317e18d5da7e2b5f61e5f077b421e9a2121744a57266692422f717858b570e"
+      }
+    ]
   }
 ]

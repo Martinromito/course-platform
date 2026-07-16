@@ -1,16 +1,16 @@
 // src/app/checkout/page.tsx
-// Página de checkout — Resumen de compra, formulario de envío y pago con MercadoPago
+// Página de checkout — Resumen de compra, datos de contacto/envío y selección de método de pago (MercadoPago o Transferencia)
 
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import Navbar from '@/components/landing/Navbar';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import toast from 'react-hot-toast';
+import { CreditCard, Landmark, CheckCircle } from 'lucide-react';
 
 function formatPrice(price: number): string {
   return `$${price.toLocaleString('es-AR')}`;
@@ -18,41 +18,56 @@ function formatPrice(price: number): string {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
-  const { items, subtotal, discount, shippingCost, total, coupon, totalItems } = useCart();
+  const { items, subtotal, discount, shippingCost, total, coupon, totalItems, clearCart } = useCart();
   
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
+  const [paymentMethod, setPaymentMethod] = useState<'mercadopago' | 'transfer'>('mercadopago');
+  const [orderCompleted, setOrderCompleted] = useState<string | null>(null);
+  const [settings, setSettings] = useState<any>(null);
+
+  const [contactData, setContactData] = useState({
+    buyerName: '',
+    buyerEmail: '',
+    buyerPhone: '',
+  });
+
+  const [shippingData, setShippingData] = useState({
     address: '',
     city: '',
     province: '',
     zip: '',
   });
 
-  // Redirigir si no está logueado o carrito vacío
-  useEffect(() => {
-    if (!authLoading) {
-      if (!user) {
-        router.push('/login?redirect=/checkout');
-        toast.error('Inicia sesión para continuar con la compra');
-      } else if (items.length === 0) {
-        router.push('/productos');
-        toast.error('Tu carrito está vacío');
-      } else if (user && !formData.name) {
-        // Pre-llenar nombre si está vacío
-        setFormData(prev => ({ ...prev, name: user.name }));
-      }
-    }
-  }, [user, authLoading, items.length, router, formData.name]);
+  // Verificar si hay productos físicos en el carrito
+  const hasPhysicalProducts = items.some(item => item.product.itemType !== 'workshop');
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (items.length === 0 && !orderCompleted) {
+      router.push('/productos');
+      toast.error('Tu carrito está vacío');
+    }
+  }, [items.length, router, orderCompleted]);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings) setSettings(data.settings);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setContactData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handlePayment = async (e: React.FormEvent) => {
+  const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setShippingData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (items.length === 0) {
@@ -62,41 +77,99 @@ export default function CheckoutPage() {
 
     setLoading(true);
 
+    const payload = {
+      items,
+      couponCode: coupon?.code,
+      buyerName: contactData.buyerName,
+      buyerEmail: contactData.buyerEmail,
+      buyerPhone: contactData.buyerPhone,
+      shippingAddress: hasPhysicalProducts ? {
+        name: contactData.buyerName,
+        phone: contactData.buyerPhone,
+        ...shippingData
+      } : undefined,
+    };
+
     try {
-      const response = await fetch('/api/payments/create-preference', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: items.map(item => ({
-            productId: item.product.id,
-            name: item.product.name,
-            quantity: item.quantity,
-          })),
-          couponCode: coupon?.code,
-          shippingAddress: formData,
-        }),
-      });
+      if (paymentMethod === 'mercadopago') {
+        const response = await fetch('/api/payments/create-preference', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al procesar el pago');
-      }
+        if (!response.ok) {
+          throw new Error(data.error || 'Error al procesar el pago');
+        }
 
-      if (data.initPoint) {
-        // Redirigir a MercadoPago
-        window.location.href = data.sandboxInitPoint || data.initPoint;
+        if (data.initPoint) {
+          clearCart();
+          window.location.href = data.sandboxInitPoint || data.initPoint;
+        }
+      } else {
+        // Transferencia bancaria
+        const response = await fetch('/api/orders/create-transfer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Error al crear el pedido');
+        }
+
+        toast.success('¡Pedido registrado con éxito!');
+        setOrderCompleted(data.orderId);
+        clearCart();
       }
     } catch (err: any) {
       toast.error(err.message || 'Error de conexión');
+    } finally {
       setLoading(false);
     }
   };
 
-  if (authLoading || !user || items.length === 0) {
+  if (orderCompleted) {
     return (
-      <div className="min-h-screen bg-[#FAF8F4] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#8B7355]"></div>
+      <div className="min-h-screen bg-[#FAF8F4] flex flex-col justify-between">
+        <Navbar />
+        <div className="max-w-2xl mx-auto px-5 py-32 text-center flex-1 flex flex-col items-center justify-center">
+          <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-6 border border-green-200">
+            <CheckCircle className="w-8 h-8" />
+          </div>
+          <h1 className="font-display text-3xl font-bold text-[#1A1A1A] mb-4">
+            ¡Gracias por tu compra!
+          </h1>
+          <p className="text-[#4A4A4A] text-base mb-2">
+            Tu orden <span className="font-mono font-bold text-[#8B7355]">#{orderCompleted}</span> ha sido registrada.
+          </p>
+          <p className="text-[#7A6E60] text-sm mb-8 max-w-md">
+            Para completar el pedido, por favor realiza la transferencia bancaria y envía el comprobante respondiendo al email de confirmación. Una vez verificado, liberaremos tu pedido/taller.
+          </p>
+
+          <div className="bg-white border border-[#E8E2D9] rounded-2xl p-6 text-left w-full max-w-md shadow-sm space-y-4 mb-8">
+            <h3 className="font-bold text-[#1A1A1A] border-b border-[#E8E2D9] pb-2 text-sm uppercase tracking-wider">
+              Datos para la Transferencia
+            </h3>
+            <div className="text-sm space-y-2">
+              <p className="text-[#4A4A4A]"><span className="font-semibold text-[#1A1A1A]">Banco:</span> {settings?.bankName || 'Galicia'}</p>
+              <p className="text-[#4A4A4A]"><span className="font-semibold text-[#1A1A1A]">Titular:</span> {settings?.bankOwner || 'La Mackenna'}</p>
+              <p className="text-[#4A4A4A]"><span className="font-semibold text-[#1A1A1A]">Alias:</span> {settings?.bankAlias || 'lamackenna.arte'}</p>
+              <p className="text-[#4A4A4A]"><span className="font-semibold text-[#1A1A1A]">CBU:</span> {settings?.bankCbu || '0070000000000000000000'}</p>
+              <div className="bg-[#FAF8F4] p-3 rounded-lg border border-[#E8E2D9]/80 text-center font-bold text-base text-[#8B7355] mt-3">
+                Total a transferir: {formatPrice(total)}
+              </div>
+            </div>
+          </div>
+
+          <Button onClick={() => router.push('/')} variant="primary">
+            Volver al inicio
+          </Button>
+        </div>
       </div>
     );
   }
@@ -112,72 +185,160 @@ export default function CheckoutPage() {
           </h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-          {/* Formulario de Envío (Izquierda) */}
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          {/* Datos del Comprador (Izquierda) */}
           <div className="lg:col-span-7 space-y-8">
-            <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-[#E8E2D9] shadow-sm">
+            {/* 1. Datos de Contacto */}
+            <div className="bg-white rounded-2xl border border-[#E8E2D9] p-6 sm:p-8 shadow-sm">
               <h2 className="text-xl font-bold text-[#1A1A1A] mb-6 flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-[#8B7355] text-white flex items-center justify-center text-sm">1</span>
-                Datos de Envío
+                Datos de Contacto
               </h2>
-
-              <form id="checkout-form" onSubmit={handlePayment} className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="sm:col-span-2">
                   <Input
                     label="Nombre Completo"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <Input
-                    label="Dirección (Calle y Altura)"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
+                    name="buyerName"
+                    value={contactData.buyerName}
+                    onChange={handleContactChange}
                     required
                   />
                 </div>
                 <Input
-                  label="Ciudad"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
+                  label="Email de Notificación"
+                  name="buyerEmail"
+                  type="email"
+                  value={contactData.buyerEmail}
+                  onChange={handleContactChange}
                   required
                 />
                 <Input
-                  label="Provincia"
-                  name="province"
-                  value={formData.province}
-                  onChange={handleInputChange}
-                  required
-                />
-                <Input
-                  label="Código Postal"
-                  name="zip"
-                  value={formData.zip}
-                  onChange={handleInputChange}
-                  required
-                />
-                <Input
-                  label="Teléfono"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
+                  label="Teléfono de Contacto"
+                  name="buyerPhone"
                   type="tel"
+                  value={contactData.buyerPhone}
+                  onChange={handleContactChange}
                   required
                 />
-              </form>
+              </div>
+            </div>
+
+            {/* 2. Datos de Envío (solo si hay productos físicos) */}
+            {hasPhysicalProducts && (
+              <div className="bg-white rounded-2xl border border-[#E8E2D9] p-6 sm:p-8 shadow-sm">
+                <h2 className="text-xl font-bold text-[#1A1A1A] mb-6 flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-full bg-[#8B7355] text-white flex items-center justify-center text-sm">2</span>
+                  Datos de Envío
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="sm:col-span-2">
+                    <Input
+                      label="Dirección (Calle y Altura)"
+                      name="address"
+                      value={shippingData.address}
+                      onChange={handleShippingChange}
+                      required
+                    />
+                  </div>
+                  <Input
+                    label="Ciudad"
+                    name="city"
+                    value={shippingData.city}
+                    onChange={handleShippingChange}
+                    required
+                  />
+                  <Input
+                    label="Provincia"
+                    name="province"
+                    value={shippingData.province}
+                    onChange={handleShippingChange}
+                    required
+                  />
+                  <div className="sm:col-span-2">
+                    <Input
+                      label="Código Postal"
+                      name="zip"
+                      value={shippingData.zip}
+                      onChange={handleShippingChange}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 3. Método de Pago */}
+            <div className="bg-white rounded-2xl border border-[#E8E2D9] p-6 sm:p-8 shadow-sm">
+              <h2 className="text-xl font-bold text-[#1A1A1A] mb-6 flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-[#8B7355] text-white flex items-center justify-center text-sm">
+                  {hasPhysicalProducts ? '3' : '2'}
+                </span>
+                Método de Pago
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <label className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-all ${
+                  paymentMethod === 'mercadopago'
+                    ? 'border-[#8B7355] bg-[#8B7355]/5'
+                    : 'border-[#E8E2D9] hover:bg-slate-50'
+                }`}>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    checked={paymentMethod === 'mercadopago'}
+                    onChange={() => setPaymentMethod('mercadopago')}
+                    className="mt-1 text-[#8B7355] focus:ring-[#8B7355]"
+                  />
+                  <div className="flex gap-2.5">
+                    <CreditCard className="w-5 h-5 text-[#8B7355] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-[#1A1A1A]">Mercado Pago</p>
+                      <p className="text-xs text-[#7A6E60]">Tarjetas de débito/crédito, dinero en cuenta o Mercado Crédito.</p>
+                    </div>
+                  </div>
+                </label>
+
+                <label className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-all ${
+                  paymentMethod === 'transfer'
+                    ? 'border-[#8B7355] bg-[#8B7355]/5'
+                    : 'border-[#E8E2D9] hover:bg-slate-50'
+                }`}>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    checked={paymentMethod === 'transfer'}
+                    onChange={() => setPaymentMethod('transfer')}
+                    className="mt-1 text-[#8B7355] focus:ring-[#8B7355]"
+                  />
+                  <div className="flex gap-2.5">
+                    <Landmark className="w-5 h-5 text-[#8B7355] flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-[#1A1A1A]">Transferencia Bancaria</p>
+                      <p className="text-xs text-[#7A6E60]">Paga directamente a nuestra cuenta bancaria. Despacho al verificar pago.</p>
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              {paymentMethod === 'transfer' && (
+                <div className="mt-6 bg-[#FAF8F4] border border-[#E8E2D9] rounded-xl p-5 text-sm space-y-2">
+                  <p className="font-semibold text-[#1A1A1A] mb-1">Datos bancarios provisorios:</p>
+                  <p className="text-[#4A4A4A]"><span className="font-semibold text-[#1A1A1A]">Banco:</span> {settings?.bankName || 'Galicia'}</p>
+                  <p className="text-[#4A4A4A]"><span className="font-semibold text-[#1A1A1A]">Alias:</span> {settings?.bankAlias || 'lamackenna.arte'}</p>
+                  <p className="text-[#4A4A4A]"><span className="font-semibold text-[#1A1A1A]">CBU:</span> {settings?.bankCbu || '0070000000000000000000'}</p>
+                  <p className="text-xs text-[#7A6E60] italic mt-2">Los datos detallados también se te mostrarán al finalizar tu compra.</p>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Resumen del Pedido (Derecha) */}
           <div className="lg:col-span-5">
-            <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-[#E8E2D9] shadow-sm sticky top-32">
+            <div className="bg-white rounded-2xl border border-[#E8E2D9] p-6 sm:p-8 shadow-sm sticky top-32">
               <h2 className="text-xl font-bold text-[#1A1A1A] mb-6 flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-[#8B7355] text-white flex items-center justify-center text-sm">2</span>
+                <span className="w-8 h-8 rounded-full bg-[#8B7355] text-white flex items-center justify-center text-sm">
+                  {hasPhysicalProducts ? '4' : '3'}
+                </span>
                 Resumen del Pedido
               </h2>
 
@@ -232,18 +393,14 @@ export default function CheckoutPage() {
 
               <Button
                 type="submit"
-                form="checkout-form"
                 className="w-full mt-8 py-4 text-base"
                 loading={loading}
               >
-                Pagar con MercadoPago
+                {paymentMethod === 'mercadopago' ? 'Pagar con MercadoPago' : 'Completar por Transferencia'}
               </Button>
-              <p className="text-center text-xs text-[#7A6E60] mt-3">
-                Serás redirigido a MercadoPago para completar el pago de forma segura.
-              </p>
             </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

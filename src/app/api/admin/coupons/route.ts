@@ -2,11 +2,11 @@
 // Admin CRUD de cupones — lee/escribe al JSON local
 
 import { NextRequest, NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth/middleware';
+import { withAdminAuth } from '@/lib/admin-auth';
 import { getCoupons, saveCoupons, type Coupon } from '@/lib/data';
 
 // GET — Lista todos los cupones
-export const GET = withAdmin(async () => {
+export const GET = withAdminAuth(async () => {
   try {
     const coupons = await getCoupons();
     return NextResponse.json({ coupons });
@@ -17,7 +17,7 @@ export const GET = withAdmin(async () => {
 });
 
 // POST — Crear nuevo cupón
-export const POST = withAdmin(async (req: NextRequest) => {
+export const POST = withAdminAuth(async (req: NextRequest) => {
   try {
     const body = await req.json();
     const { code, type, value, minPurchase, maxUses, expiresAt } = body;
