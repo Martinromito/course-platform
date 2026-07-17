@@ -8,7 +8,7 @@ import Navbar from '@/components/landing/Navbar';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import toast from 'react-hot-toast';
-import { Trash2, Edit2, Plus, Box, ArrowLeft, Loader2 } from 'lucide-react';
+import { Trash2, Edit2, Plus, Box, ArrowLeft, Loader2, UploadCloud, Link as LinkIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Product {
@@ -30,6 +30,9 @@ export default function AdminProductosPage() {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<Product>>({});
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const [imageSource, setImageSource] = useState<'upload' | 'url'>('upload');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -66,18 +69,24 @@ export default function AdminProductosPage() {
   const handleOpenForm = (product?: Product) => {
     if (product) {
       setFormData(product);
+      if (product.image && !product.image.startsWith('/uploads/') && !product.image.startsWith('/images/')) {
+        setImageSource('url');
+      } else {
+        setImageSource('upload');
+      }
     } else {
       setFormData({
         name: '',
         description: '',
         price: 0,
         originalPrice: null,
-        image: '/images/product-pieza.png',
+        image: '',
         badge: '',
         category: 'kits',
         stock: 999,
         isActive: true,
       });
+      setImageSource('upload');
     }
     setIsEditing(true);
   };
@@ -87,8 +96,70 @@ export default function AdminProductosPage() {
     setFormData({});
   };
 
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      await handleUploadFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      await handleUploadFile(e.target.files[0]);
+    }
+  };
+
+  const handleUploadFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Por favor, selecciona un archivo de imagen válido.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('La imagen excede el límite de 5MB.');
+      return;
+    }
+
+    setUploadingImage(true);
+    const data = new FormData();
+    data.append('file', file);
+
+    try {
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: data,
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error || 'Error al subir la imagen');
+      }
+      setFormData((prev) => ({ ...prev, image: result.url }));
+      toast.success('Imagen subida con éxito');
+    } catch (err: any) {
+      toast.error(err.message || 'Error al subir la imagen');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.image) {
+      toast.error('Por favor, carga una imagen o ingresa una URL.');
+      return;
+    }
     setLoading(true);
 
     try {
@@ -144,9 +215,10 @@ export default function AdminProductosPage() {
           <div>
             <button
               onClick={() => router.push('/admin')}
-              className="flex items-center gap-1.5 text-xs text-[#8B7355] font-semibold uppercase tracking-wider mb-2 hover:underline"
+              className="group mb-3 inline-flex items-center gap-2 text-sm font-semibold text-[#8B7355] hover:text-[#705E45] transition-colors cursor-pointer"
             >
-              <ArrowLeft className="w-3.5 h-3.5" /> Volver al Panel
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+              Volver al Panel
             </button>
             <h1 className="font-display text-3xl font-bold text-[#1A1A1A] flex items-center gap-3">
               <Box className="w-8 h-8 text-[#8B7355]" />
@@ -201,14 +273,140 @@ export default function AdminProductosPage() {
                 onChange={(e) => setFormData({...formData, originalPrice: e.target.value ? Number(e.target.value) : null})}
                 className="text-slate-800"
               />
-              <div className="sm:col-span-2">
-                <Input
-                  label="URL Imagen"
-                  value={formData.image || ''}
-                  onChange={(e) => setFormData({...formData, image: e.target.value})}
-                  required
-                  className="text-slate-800"
-                />
+              <div className="sm:col-span-2 flex flex-col gap-3">
+                <label className="text-sm font-medium text-slate-700">Imagen del Producto</label>
+                
+                <div className="flex gap-2 p-1 bg-[#FAF8F4] border border-[#E8E2D9] rounded-xl self-start">
+                  <button
+                    type="button"
+                    onClick={() => setImageSource('upload')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                      imageSource === 'upload'
+                        ? 'bg-[#8B7355] text-white shadow-sm'
+                        : 'text-[#7A6E60] hover:text-[#1A1A1A] hover:bg-[#F2F0ED]'
+                    }`}
+                  >
+                    <UploadCloud className="w-4 h-4" /> Cargar Archivo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setImageSource('url')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                      imageSource === 'url'
+                        ? 'bg-[#8B7355] text-white shadow-sm'
+                        : 'text-[#7A6E60] hover:text-[#1A1A1A] hover:bg-[#F2F0ED]'
+                    }`}
+                  >
+                    <LinkIcon className="w-4 h-4" /> URL Externa
+                  </button>
+                </div>
+
+                {imageSource === 'upload' ? (
+                  <div
+                    onDragEnter={handleDrag}
+                    onDragOver={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDrop={handleDrop}
+                    className={`relative border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center min-h-[220px] transition-all duration-200 ${
+                      dragActive
+                        ? 'border-[#8B7355] bg-[#8B7355]/5 scale-[0.99]'
+                        : 'border-[#E8E2D9] bg-[#FAF8F4]/30 hover:border-[#8B7355]/60 hover:bg-[#FAF8F4]/50'
+                    }`}
+                  >
+                    <input
+                      type="file"
+                      id="image-file-input"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      disabled={uploadingImage}
+                    />
+
+                    {uploadingImage ? (
+                      <div className="flex flex-col items-center gap-3">
+                        <Loader2 className="w-10 h-10 animate-spin text-[#8B7355]" />
+                        <p className="text-sm font-medium text-[#7A6E60]">Subiendo imagen...</p>
+                      </div>
+                    ) : formData.image ? (
+                      <div className="flex flex-col sm:flex-row items-center gap-6 w-full max-w-lg">
+                        <div className="relative w-32 h-32 rounded-xl overflow-hidden shadow-md border border-[#E8E2D9] bg-[#F5F0E8] flex-shrink-0">
+                          <img
+                            src={formData.image}
+                            alt="Vista previa del producto"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 flex flex-col items-center sm:items-start text-center sm:text-left gap-3">
+                          <div className="text-sm text-slate-800">
+                            <span className="font-semibold block mb-0.5 text-[#1A1A1A]">Imagen cargada:</span>
+                            <span className="text-xs text-[#7A6E60] break-all bg-slate-100 p-1.5 rounded block border border-slate-200/50 mt-1 select-all font-mono">
+                              {formData.image}
+                            </span>
+                          </div>
+                          <div className="flex gap-2">
+                            <label
+                              htmlFor="image-file-input"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#8B7355] text-white rounded-lg text-xs font-semibold hover:bg-[#705E45] transition-colors cursor-pointer"
+                            >
+                              <UploadCloud className="w-3.5 h-3.5" /> Cambiar
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setFormData({ ...formData, image: '' })}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-semibold hover:bg-red-100 transition-colors cursor-pointer"
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="image-file-input"
+                        className="flex flex-col items-center gap-3 cursor-pointer text-center group"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-[#8B7355]/10 text-[#8B7355] flex items-center justify-center transition-transform group-hover:scale-110">
+                          <UploadCloud className="w-6 h-6" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-semibold text-[#1A1A1A]">
+                            Arrastra y soltá tu imagen aquí, o <span className="text-[#8B7355] underline">explorá</span>
+                          </p>
+                          <p className="text-xs text-[#7A6E60]">
+                            Formatos soportados: PNG, JPG, WEBP, GIF, SVG (Máx. 5MB)
+                          </p>
+                        </div>
+                      </label>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Input
+                      label="URL de Imagen Externa"
+                      placeholder="https://ejemplo.com/imagen.jpg"
+                      value={formData.image || ''}
+                      onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                      required
+                      className="text-slate-800"
+                    />
+                    {formData.image && (
+                      <div className="mt-2 flex gap-3 items-center p-3 bg-[#FAF8F4] border border-[#E8E2D9] rounded-xl">
+                        <img
+                          src={formData.image}
+                          alt="Vista previa URL"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/images/product-pieza.png';
+                          }}
+                          className="w-12 h-12 object-cover rounded bg-[#F5F0E8] border border-[#E8E2D9]"
+                        />
+                        <div className="text-xs">
+                          <span className="font-semibold block text-[#1A1A1A]">Vista previa de la URL</span>
+                          <span className="text-[#7A6E60] truncate max-w-[250px] block">{formData.image}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               <Input
                 label="Categoría"

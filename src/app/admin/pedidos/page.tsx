@@ -157,9 +157,10 @@ export default function AdminOrdersPage() {
           <div>
             <button
               onClick={() => router.push('/admin')}
-              className="flex items-center gap-1.5 text-xs text-[#8B7355] font-semibold uppercase tracking-wider mb-2 hover:underline"
+              className="group mb-3 inline-flex items-center gap-2 text-sm font-semibold text-[#8B7355] hover:text-[#705E45] transition-colors cursor-pointer"
             >
-              <ArrowLeft className="w-3.5 h-3.5" /> Volver al Panel
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+              Volver al Panel
             </button>
             <h1 className="text-3xl font-black text-[#1A1A1A]">Pedidos & Ventas</h1>
             <p className="text-[#7A6E60] mt-1 font-medium">Controla los pagos, envíos y accesos de tus clientas.</p>
@@ -300,6 +301,15 @@ export default function AdminOrdersPage() {
           {/* Panel de Detalle Derecho */}
           {selectedOrder && (
             <div className="bg-white border border-[#E8E2D9] rounded-[28px] p-6 shadow-sm space-y-6 lg:col-span-1">
+              <button
+                type="button"
+                onClick={() => setSelectedOrder(null)}
+                className="lg:hidden group inline-flex items-center gap-2 text-sm font-semibold text-[#8B7355] hover:text-[#705E45] transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+                Volver a la lista de pedidos
+              </button>
+
               <div className="flex justify-between items-center pb-4 border-b border-[#E8E2D9]">
                 <div>
                   <h3 className="font-bold text-[#1A1A1A]">Detalle del Pedido</h3>

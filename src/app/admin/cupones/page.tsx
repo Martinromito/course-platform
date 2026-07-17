@@ -142,9 +142,10 @@ export default function AdminCuponesPage() {
           <div>
             <button
               onClick={() => router.push('/admin')}
-              className="flex items-center gap-1.5 text-xs text-[#8B7355] font-semibold uppercase tracking-wider mb-2 hover:underline"
+              className="group mb-3 inline-flex items-center gap-2 text-sm font-semibold text-[#8B7355] hover:text-[#705E45] transition-colors cursor-pointer"
             >
-              <ArrowLeft className="w-3.5 h-3.5" /> Volver al Panel
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+              Volver al Panel
             </button>
             <h1 className="font-display text-3xl font-bold text-[#1A1A1A] flex items-center gap-3">
               <Tag className="w-8 h-8 text-[#8B7355]" />
