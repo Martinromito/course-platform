@@ -27,10 +27,11 @@ function formatPrice(price: number): string {
 }
 
 export default function WorkshopsPage() {
-  const [workshops, setWorkshops ] = useState<Workshop[]>([]);
+  const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [loading, setLoading] = useState(true);
   const { addItem, openCart } = useCart();
   const router = useRouter();
+
 
   useEffect(() => {
     fetch('/api/workshops')
