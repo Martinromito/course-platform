@@ -148,7 +148,7 @@ export default function AdminOrdersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F4] p-6 sm:p-8 pt-28">
+    <div className="min-h-screen bg-[#FAF8F4] pt-28 pb-16 px-6 sm:px-8">
       <Navbar />
 
       <div className="max-w-7xl mx-auto">

@@ -24,6 +24,30 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<'mercadopago' | 'transfer'>('mercadopago');
   const [orderCompleted, setOrderCompleted] = useState<string | null>(null);
   const [settings, setSettings] = useState<any>(null);
+  const [emailError, setEmailError] = useState('');
+
+  // Regex estricta: requiere al menos 2 caracteres en el TLD (ej: .com, .ar, .net)
+  // Rechaza TLDs de 1 caracter (.c) o inválidos como .con
+  const validateEmail = (email: string): string => {
+    if (!email) return '';
+    const strictEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!strictEmailRegex.test(email)) {
+      return 'El email no parece válido. Verificá que el dominio sea correcto (ej: @gmail.com).';
+    }
+    // Lista de TLDs comúnmente escritos mal
+    const commonTypos: Record<string, string> = {
+      '.con': '.com', '.cm': '.com', '.cmo': '.com',
+      '.ner': '.net', '.nte': '.net',
+      '.ogr': '.org', '.rog': '.org',
+    };
+    const lower = email.toLowerCase();
+    for (const [typo, correct] of Object.entries(commonTypos)) {
+      if (lower.endsWith(typo)) {
+        return `¿Quisiste decir ${email.slice(0, -typo.length)}${correct}?`;
+      }
+    }
+    return '';
+  };
 
   const [contactData, setContactData] = useState({
     buyerName: '',
@@ -60,6 +84,10 @@ export default function CheckoutPage() {
   const handleContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setContactData(prev => ({ ...prev, [name]: value }));
+    // Validar email en tiempo real
+    if (name === 'buyerEmail') {
+      setEmailError(validateEmail(value));
+    }
   };
 
   const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,6 +100,16 @@ export default function CheckoutPage() {
     
     if (items.length === 0) {
       toast.error('El carrito está vacío');
+      return;
+    }
+
+    // Validación de email antes de enviar
+    const emailValidationError = validateEmail(contactData.buyerEmail);
+    if (emailValidationError) {
+      setEmailError(emailValidationError);
+      toast.error('Por favor corregí el email antes de continuar.');
+      // Hacer scroll hacia el input de email
+      document.getElementById('buyerEmail')?.focus();
       return;
     }
 
@@ -207,9 +245,11 @@ export default function CheckoutPage() {
                 <Input
                   label="Email de Notificación"
                   name="buyerEmail"
+                  id="buyerEmail"
                   type="email"
                   value={contactData.buyerEmail}
                   onChange={handleContactChange}
+                  error={emailError}
                   required
                 />
                 <Input

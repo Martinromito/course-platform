@@ -23,6 +23,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Faltan datos de contacto obligatorios.' }, { status: 400 });
     }
 
+    // Validación estricta del formato de email (evita errores como gmail.con)
+    const strictEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!strictEmailRegex.test(buyerEmail)) {
+      return NextResponse.json(
+        { error: 'El formato del email no es válido. Verificá que el dominio sea correcto (ej: nombre@gmail.com).' },
+        { status: 400 }
+      );
+    }
+
     // 1. Validar productos/talleres y precios contra JSON
     const allProducts = await getProducts();
     const allWorkshops = await getWorkshops();
@@ -243,7 +252,7 @@ export async function POST(req: NextRequest) {
       };
 
       const result = await preference.create({ body: mpBody });
-      preferenceId = result.id;
+      preferenceId = result.id!;
       initPoint = result.init_point!;
       sandboxInitPoint = result.sandbox_init_point!;
 
