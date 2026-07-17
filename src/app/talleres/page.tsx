@@ -32,7 +32,6 @@ export default function WorkshopsPage() {
   const { addItem, openCart } = useCart();
   const router = useRouter();
 
-
   useEffect(() => {
     fetch('/api/workshops')
       .then((res) => res.json())
