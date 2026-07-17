@@ -138,7 +138,15 @@ async function writeJSON<T>(filePath: string, data: T[]): Promise<void> {
 async function kvReadArray<T>(key: string, fallbackFile: string): Promise<T[]> {
   if (hasRedis()) {
     const result = await kvGet<T[]>(key);
-    return result ?? [];
+    if (result !== null && result !== undefined) {
+      return result;
+    }
+    // Si Redis está vacío, intentamos sembrar desde el JSON local
+    const fallbackData = await readJSON<T>(fallbackFile);
+    if (fallbackData && fallbackData.length > 0) {
+      await kvSet(key, fallbackData);
+    }
+    return fallbackData ?? [];
   }
   return readJSON<T>(fallbackFile);
 }
@@ -154,7 +162,7 @@ async function kvWriteArray<T>(key: string, fallbackFile: string, data: T[]): Pr
 // ─── Products ────────────────────────────────────────────────────────────────
 
 export async function getProducts(): Promise<Product[]> {
-  return readJSON<Product>(PRODUCTS_FILE);
+  return kvReadArray<Product>('products', PRODUCTS_FILE);
 }
 
 export async function getActiveProducts(): Promise<Product[]> {
@@ -168,13 +176,13 @@ export async function getProductById(id: string): Promise<Product | undefined> {
 }
 
 export async function saveProducts(products: Product[]): Promise<void> {
-  return writeJSON(PRODUCTS_FILE, products);
+  return kvWriteArray('products', PRODUCTS_FILE, products);
 }
 
 // ─── Workshops ───────────────────────────────────────────────────────────────
 
 export async function getWorkshops(): Promise<Workshop[]> {
-  return readJSON<Workshop>(WORKSHOPS_FILE);
+  return kvReadArray<Workshop>('workshops', WORKSHOPS_FILE);
 }
 
 export async function getActiveWorkshops(): Promise<Workshop[]> {
@@ -188,7 +196,7 @@ export async function getWorkshopById(id: string): Promise<Workshop | undefined>
 }
 
 export async function saveWorkshops(workshops: Workshop[]): Promise<void> {
-  return writeJSON(WORKSHOPS_FILE, workshops);
+  return kvWriteArray('workshops', WORKSHOPS_FILE, workshops);
 }
 
 // ─── Coupons ─────────────────────────────────────────────────────────────────
@@ -270,7 +278,17 @@ const DEFAULT_SETTINGS: Settings = {
 export async function getSettings(): Promise<Settings> {
   if (hasRedis()) {
     const result = await kvGet<Settings>('settings');
-    return result ?? DEFAULT_SETTINGS;
+    if (result !== null && result !== undefined) {
+      return result;
+    }
+    // Si Redis está vacío, intentamos sembrar desde el archivo local de settings o DEFAULT_SETTINGS
+    let initialSettings = DEFAULT_SETTINGS;
+    try {
+      const raw = await fs.readFile(SETTINGS_FILE, 'utf-8');
+      initialSettings = JSON.parse(raw) as Settings;
+    } catch {}
+    await kvSet('settings', initialSettings);
+    return initialSettings;
   }
   try {
     const raw = await fs.readFile(SETTINGS_FILE, 'utf-8');
