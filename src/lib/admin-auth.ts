@@ -58,9 +58,9 @@ export function createAdminLogoutResponse(): NextResponse {
 
 /** Middleware para proteger rutas API de admin */
 export function withAdminAuth(
-  handler: (req: NextRequest) => Promise<NextResponse>
+  handler: (req: NextRequest, context?: any) => Promise<NextResponse>
 ) {
-  return async (req: NextRequest): Promise<NextResponse> => {
+  return async (req: NextRequest, context?: any): Promise<NextResponse> => {
     const authenticated = await isAdminAuthenticated();
     if (!authenticated) {
       return NextResponse.json(
@@ -68,6 +68,6 @@ export function withAdminAuth(
         { status: 401 }
       );
     }
-    return handler(req);
+    return handler(req, context);
   };
 }
